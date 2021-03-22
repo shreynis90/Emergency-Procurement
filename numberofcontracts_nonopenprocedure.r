@@ -252,6 +252,7 @@ for (i in 1: nrow(ncontracts5)) {
 ncontracts5<-ncontracts5[order(ncontracts5$Date),]
 ncontracts5
 
+##Monthly Analysis ----
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
 
 ncontracts <- ncontracts %>% group_by(time, tender_indicator_INTEGRITY_PROCEDURE_TYPE)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(tender_indicator_INTEGRITY_PROCEDURE_TYPE,time, numberofcontracts, treatcon, ord) %>% distinct()
@@ -264,6 +265,8 @@ ncontracts<-ncontracts[order(ncontracts$ord),]
 
 ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts, fill=as.factor(tender_indicator_INTEGRITY_PROCEDURE_TYPE))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Set1")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) +  geom_vline(xintercept=ncontracts$ord[25] ,linetype=1, colour="black")+ labs(title="Monthly Number of Contracts By Open Vs Non-open Procedure", x="Dates (unit in Months)", y = "Monthly number of contracts" , subtitle="T = 0 depicts disaster incidence", fill = "1: Non Open Procedure")
+
+#Quarterly Analysis ----
 
 ncontracts<- NULL
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
@@ -336,6 +339,8 @@ ggplot(data=ncontracts, aes(x=fct_inorder(date), y=share, fill=as.factor(tender_
 ggplot(data=ncontracts, aes(x=fct_inorder(date), y=numberofcontracts, fill=as.factor(tender_indicator_INTEGRITY_PROCEDURE_TYPE))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) +  geom_vline(xintercept=ncontracts$ord[25] ,linetype=1, colour="black")+ labs(title="Quarterly Share of Contracts By Procedure Type", x="Dates (unit in Quarters)", y = "Quarterly Number of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: Non-Open Procedure")
 
+
+##T-tests ----
 ncontracts_before_3 <- ncontracts[c(1:24),]
 ncontracts_after_3 <- ncontracts[c(27:50),]
 ncontracts_before_3.gr1 <- ncontracts_before_3 %>% filter(tender_indicator_INTEGRITY_PROCEDURE_TYPE == 1)
