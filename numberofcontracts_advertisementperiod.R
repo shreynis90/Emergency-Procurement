@@ -250,6 +250,8 @@ for (i in 1: nrow(ncontracts5)) {
 ncontracts5<-ncontracts5[order(ncontracts5$Date),]
 ncontracts5
 
+####Monthly Analysis ----
+
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
 
 ncontracts <- ncontracts %>% group_by(time,advertintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(time, numberofcontracts, treatcon, ord, advertintegrity) %>% distinct()
@@ -266,7 +268,7 @@ ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts)) + geom_ba
 ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts, fill=as.factor(advertintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Set2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) +  geom_vline(xintercept=ncontracts$ord[11] ,linetype=1, colour="black")+ labs(title="Monthly Number of Contracts by Advertisement Integrity", x="Dates (unit in Months)", y = "Monthly number of contracts" , subtitle="T = 0 depicts disaster incidence", fill = "0: Risky Advertisement Period")
 
-
+####Quarterly Analysis ----
 
 ncontracts<- NULL
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
