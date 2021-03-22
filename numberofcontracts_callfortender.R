@@ -17,6 +17,8 @@ memory.limit(size = 30000)
 gc()
 italy<- read_excel("data_09_20.xlsx")
 italy<-as.data.frame(italy)
+
+#Fixing the date issue with contracts from before 2011----
 italy$tender_publications_firstCallForTenderDate <- as.POSIXct(italy$tender_publications_firstCallForTenderDate,format='%Y/%m/%d')
 italy$tender_publications_firstdContractAwardDate <- as.POSIXct(italy$tender_publications_firstdContractAwardDate,format='%Y/%m/%d')
 italy$tender_bidDeadline <- as.POSIXct(italy$tender_bidDeadline,format='%Y/%m/%d')
@@ -26,9 +28,10 @@ diff<- median(round(difftime(italy_temp$tender_bidDeadline, italy_temp$tender_pu
 italy$tender_publications_firstCallForTenderDate <- fifelse(italy$contractDate<"2011-01-01", italy$tender_bidDeadline - days(diff), italy$tender_publications_firstCallForTenderDate)
 italy<- italy %>% filter(contractDate> as.POSIXct("2000-01-01", "%Y-%m-%d",tz="GMT"))
 
+#Flipping the dependent variable so that high number indicates higher corruption risk
 italy$tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION<- ifelse(italy$tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 0, 1,0)
 
-
+#Disaster 1 ----
 italy_disaster1<- italy %>%
   filter(disnumber == "Disaster_001"|is.na(disnumber))
 ##
@@ -245,6 +248,8 @@ for (i in 1: nrow(ncontracts5)) {
 ncontracts5<-ncontracts5[order(ncontracts5$Date),]
 ncontracts5
 
+##Monthly Analysis ----
+
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
 
 ncontracts <- ncontracts %>% group_by(time, tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION,time, numberofcontracts, treatcon, ord) %>% distinct()
@@ -257,6 +262,9 @@ ncontracts<-ncontracts[order(ncontracts$ord),]
 
 ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts, fill=as.factor(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION))) + geom_bar(stat="identity")+  scale_fill_brewer(palette=7)+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) + labs(title="Monthly Number of Contracts By Call for Tender", x="Dates (unit in Months)", y = "Monthly number of contracts" , subtitle="T = 0 depicts disaster incidence", fill = "1: No call published")
+
+
+##Quarterly Analysis ----
 
 ncontracts<- NULL
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
@@ -330,7 +338,7 @@ ggplot(data=ncontracts, aes(x=fct_inorder(date), y=numberofcontracts, fill=as.fa
 ggplot(data=ncontracts, aes(x=fct_inorder(date), y=share, fill=as.factor(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) + labs(title="Quarterly Share of Contracts By Call for Tender", x="Dates (unit in Quarters)", y = "Quarterly Share of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: No call published")
 
-
+##T-tests ----
 
 ncontracts_before_3 <- ncontracts[c(1:24),]
 ncontracts_after_3 <- ncontracts[c(27:50),]
