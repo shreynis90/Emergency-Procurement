@@ -341,6 +341,8 @@ ggplot(data=ncontracts, aes(x=fct_inorder(date), y=share, fill=as.factor(adverti
 ggplot(data=ncontracts, aes(x=fct_inorder(date), y=numberofcontracts, fill=as.factor(advertintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) + labs(title="Quarterly Number of Contracts By Risky Advertisement Period", x="Dates (unit in Quarters)", y = "Quarterly Number of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: Risky Advert Period")
 
+
+#T-tests
 ncontracts_before_3 <- ncontracts[c(1:24),]
 ncontracts_after_3 <- ncontracts[c(27:50),]
 ncontracts_before_3.gr1 <- ncontracts_before_3 %>% filter(advertintegrity == 1)
