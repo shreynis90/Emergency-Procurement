@@ -334,7 +334,7 @@ tr<- max(which(l == 1))
 
 ##GENERATING QUARTER NUMBER
 
-for (i in 1:nrow(ncontracts)) {
+for (i in 1:(nrow(ncontracts))) {
   if(ncontracts$ord[i] %% 3 == 1 & ncontracts$ord[i]> 0){
     for(j in i:(i + 6)){
       ncontracts$date[j] <- paste0("q",round(ncontracts$ord[i]/3 +1))
