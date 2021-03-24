@@ -10,6 +10,8 @@ library(zoo)
 library(scales)
 library(forcats)
 library(reshape2)
+library(stargazer)
+library(broom)
 
 memory.limit(size = 30000)
 gc()
@@ -400,3 +402,22 @@ t3
 t2
 t1
 
+italy_reg<- italy
+italy_reg$log_tender_finalPrice_EUR <- log(italy_reg$tender_finalPrice_EUR)
+italy_reg$two_tender_mainCpv <- as.integer(italy_reg$tender_mainCpv)
+italy_reg$two_tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_reg$two_tender_mainCpv)
+italy_reg$two_tender_mainCpv <- as.integer(italy_reg$two_tender_mainCpv)
+italy_reg$contractyear<- ifelse(is.na(italy_reg$tender_publications_firstCallForTenderDate), substring(italy_reg$tender_publications_firstdContractAwardDate,1,4),substring(italy_reg$tender_publications_firstCallForTenderDate,1,4)) #Contract year
+italy_reg <- subset(italy_reg, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
+
+model1 <- glm(singlebidintegrity ~ treatcon + log_tender_finalPrice_EUR + factor(two_tender_mainCpv)+ buyer_buyerType + contractyear, family = "binomial", data = italy_reg)
+sum<-summary.lm(model1)
+
+sum$coefficients <- sum$coefficients[1:2,]
+
+print(sum)
+
+model2<- lm(singlebidintegrity ~ treatcon + log_tender_finalPrice_EUR + factor(two_tender_mainCpv)  + buyer_buyerType + contractyear, data = italy_reg)
+summary(model2)
+
+stargazer(model1, type='latex', summary=FALSE)

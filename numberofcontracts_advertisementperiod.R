@@ -19,7 +19,7 @@ italy$tender_publications_firstCallForTenderDate <- as.POSIXct(italy$tender_publ
 italy$tender_publications_firstdContractAwardDate <- as.POSIXct(italy$tender_publications_firstdContractAwardDate,format='%Y/%m/%d')
 italy$tender_bidDeadline <- as.POSIXct(italy$tender_bidDeadline,format='%Y/%m/%d')
 
-##Fixing the issue with Dates from before 2011----
+##Fixing the issue with Dates ----
 italy$contractDate<- fifelse(is.na(italy$tender_publications_firstCallForTenderDate),fifelse(is.na(italy$tender_publications_firstdContractAwardDate),as.POSIXct("2000-01-01", "%Y-%m-%d",tz="GMT"),italy$tender_publications_firstdContractAwardDate),italy$tender_publications_firstCallForTenderDate)
 italy_temp <- italy %>% filter(contractDate> as.POSIXct("2011-01-01", "%Y-%m-%d",tz="GMT"))
 diff<- median(round(difftime(italy_temp$tender_bidDeadline, italy_temp$tender_publications_firstCallForTenderDate, units = "days"),0), na.rm =  TRUE)
@@ -250,8 +250,6 @@ for (i in 1: nrow(ncontracts5)) {
 ncontracts5<-ncontracts5[order(ncontracts5$Date),]
 ncontracts5
 
-####Monthly Analysis ----
-
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
 
 ncontracts <- ncontracts %>% group_by(time,advertintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(time, numberofcontracts, treatcon, ord, advertintegrity) %>% distinct()
@@ -268,7 +266,7 @@ ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts)) + geom_ba
 ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts, fill=as.factor(advertintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Set2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) +  geom_vline(xintercept=ncontracts$ord[11] ,linetype=1, colour="black")+ labs(title="Monthly Number of Contracts by Advertisement Integrity", x="Dates (unit in Months)", y = "Monthly number of contracts" , subtitle="T = 0 depicts disaster incidence", fill = "0: Risky Advertisement Period")
 
-####Quarterly Analysis ----
+
 
 ncontracts<- NULL
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
@@ -341,8 +339,6 @@ ggplot(data=ncontracts, aes(x=fct_inorder(date), y=share, fill=as.factor(adverti
 ggplot(data=ncontracts, aes(x=fct_inorder(date), y=numberofcontracts, fill=as.factor(advertintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) + labs(title="Quarterly Number of Contracts By Risky Advertisement Period", x="Dates (unit in Quarters)", y = "Quarterly Number of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: Risky Advert Period")
 
-
-#T-tests
 ncontracts_before_3 <- ncontracts[c(1:24),]
 ncontracts_after_3 <- ncontracts[c(27:50),]
 ncontracts_before_3.gr1 <- ncontracts_before_3 %>% filter(advertintegrity == 1)
@@ -375,6 +371,24 @@ mean(ncontracts_after_1.gr1$share)
 t1<-t.test(ncontracts_before_1.gr1$share , ncontracts_after_1.gr1$share, paired = TRUE, conf.level = 0.95)
 t1
 
+
+italy_reg<- italy
+italy_reg$log_tender_finalPrice_EUR <- log(italy_reg$tender_finalPrice_EUR)
+italy_reg$two_tender_mainCpv <- as.integer(italy_reg$tender_mainCpv)
+italy_reg$two_tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_reg$two_tender_mainCpv)
+italy_reg$two_tender_mainCpv <- as.integer(italy_reg$two_tender_mainCpv)
+italy_reg$contractyear<- ifelse(is.na(italy_reg$tender_publications_firstCallForTenderDate), substring(italy_reg$tender_publications_firstdContractAwardDate,1,4),substring(italy_reg$tender_publications_firstCallForTenderDate,1,4)) #Contract year
+italy_reg <- subset(italy_reg, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
+
+model1 <- glm(advertintegrity ~ treatcon + log_tender_finalPrice_EUR + factor(two_tender_mainCpv)+ buyer_buyerType + contractyear, family = "binomial", data = italy_reg)
+sum<-summary.lm(model1)
+
+sum$coefficients <- sum$coefficients[1:2,]
+
+print(sum)
+
+model2<- lm(advertintegrity ~ treatcon + log_tender_finalPrice_EUR + factor(two_tender_mainCpv)  + buyer_buyerType + contractyear, data = italy_reg)
+summary(model2)
 
 
 
