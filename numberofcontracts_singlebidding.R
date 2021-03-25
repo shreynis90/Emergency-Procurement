@@ -391,11 +391,10 @@ t2
 
 ncontracts_before_1 <- ncontracts[c(17:24),]
 ncontracts_after_1 <- ncontracts[c(27:34),]
-mean(ncontracts_before_1.gr1$share)
-mean(ncontracts_after_1.gr1$share)
-
 ncontracts_before_1.gr1 <- ncontracts_before_1 %>% filter(singlebidintegrity == 1)
 ncontracts_after_1.gr1 <- ncontracts_after_1 %>% filter(singlebidintegrity == 1)
+mean(ncontracts_before_1.gr1$share)
+mean(ncontracts_after_1.gr1$share)
 
 t1<-t.test(ncontracts_before_1.gr1$share , ncontracts_after_1.gr1$share, paired = TRUE, conf.level = 0.95)
 t3
