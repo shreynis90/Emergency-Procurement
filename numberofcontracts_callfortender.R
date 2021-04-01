@@ -12,13 +12,12 @@ library(forcats)
 library(reshape2)
 library(formattable)
 library(gt)
+library(modEvA)
 
 memory.limit(size = 30000)
 gc()
 italy<- read_excel("data_09_20.xlsx")
 italy<-as.data.frame(italy)
-
-#Fixing the date issue with contracts from before 2011----
 italy$tender_publications_firstCallForTenderDate <- as.POSIXct(italy$tender_publications_firstCallForTenderDate,format='%Y/%m/%d')
 italy$tender_publications_firstdContractAwardDate <- as.POSIXct(italy$tender_publications_firstdContractAwardDate,format='%Y/%m/%d')
 italy$tender_bidDeadline <- as.POSIXct(italy$tender_bidDeadline,format='%Y/%m/%d')
@@ -28,10 +27,9 @@ diff<- median(round(difftime(italy_temp$tender_bidDeadline, italy_temp$tender_pu
 italy$tender_publications_firstCallForTenderDate <- fifelse(italy$contractDate<"2011-01-01", italy$tender_bidDeadline - days(diff), italy$tender_publications_firstCallForTenderDate)
 italy<- italy %>% filter(contractDate> as.POSIXct("2000-01-01", "%Y-%m-%d",tz="GMT"))
 
-#Flipping the dependent variable so that high number indicates higher corruption risk
-italy$tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION<- ifelse(italy$tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 0, 1,0)
+italy$callintegrity<- ifelse(italy$tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 0, 1,0)
 
-#Disaster 1 ----
+
 italy_disaster1<- italy %>%
   filter(disnumber == "Disaster_001"|is.na(disnumber))
 ##
@@ -52,7 +50,7 @@ disaster1_date <- as.POSIXct("2009-10-02")
 italy_disaster1 <- subset(italy_disaster1, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 
 italy_disaster1$Date <- as.yearmon(paste(italy_disaster1$contractmonth, italy_disaster1$contractyear), "%m %Y")
-ncontracts1 <- italy_disaster1 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION
+ncontracts1 <- italy_disaster1 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, callintegrity
 )%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
 
 ncontracts1
@@ -80,7 +78,7 @@ disaster2_date <- as.POSIXct("2012-05-29")
 
 ###Number of Contracts ----
 italy_disaster2$Date <- as.yearmon(paste(italy_disaster2$contractmonth, italy_disaster2$contractyear), "%m %Y")
-ncontracts2 <- italy_disaster2 %>% filter(treatcon == 1) %>% group_by(Date,tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
+ncontracts2 <- italy_disaster2 %>% filter(treatcon == 1) %>% group_by(Date,callintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
 
 ##Disaster 3 ----
 #Removing contracts from other disaster areas#
@@ -105,7 +103,7 @@ disaster3_date <- as.POSIXct("2013-11-18")
 
 ###Number of Contracts ----
 italy_disaster3$Date <- as.yearmon(paste(italy_disaster3$contractmonth, italy_disaster3$contractyear), "%m %Y")
-ncontracts3 <- italy_disaster3 %>% filter(treatcon == 1) %>% group_by(Date, treatcon,tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
+ncontracts3 <- italy_disaster3 %>% filter(treatcon == 1) %>% group_by(Date, treatcon,callintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
 
 
 ##Disaster 4 ----
@@ -131,7 +129,7 @@ disaster4_date <- as.POSIXct("2016-08-24")
 
 ###Number of Contracts ----
 italy_disaster4$Date <- as.yearmon(paste(italy_disaster4$contractmonth, italy_disaster4$contractyear), "%m %Y")
-ncontracts4 <- italy_disaster4 %>% filter(treatcon == 1) %>% group_by(Date, treatcon,tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
+ncontracts4 <- italy_disaster4 %>% filter(treatcon == 1) %>% group_by(Date, treatcon,callintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
 
 
 ##Disaster 5----
@@ -157,7 +155,7 @@ disaster5_date <- as.POSIXct("2017-01-18")
 
 ###Number of Contracts ----
 italy_disaster5$Date <- as.yearmon(paste(italy_disaster5$contractmonth, italy_disaster5$contractyear), "%m %Y")
-ncontracts5 <- italy_disaster5 %>% filter(treatcon == 1) %>% group_by(Date, treatcon,tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
+ncontracts5 <- italy_disaster5 %>% filter(treatcon == 1) %>% group_by(Date, treatcon,callintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber) %>% distinct()
 
 add<- c("time","ord")
 ncontracts1[,add]<- NA
@@ -248,11 +246,9 @@ for (i in 1: nrow(ncontracts5)) {
 ncontracts5<-ncontracts5[order(ncontracts5$Date),]
 ncontracts5
 
-##Monthly Analysis ----
-
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
 
-ncontracts <- ncontracts %>% group_by(time, tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION,time, numberofcontracts, treatcon, ord) %>% distinct()
+ncontracts <- ncontracts %>% group_by(time, callintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(callintegrity,time, numberofcontracts, treatcon, ord) %>% distinct()
 
 ncontracts<- as.data.frame(ncontracts)
 ncontracts$ord<- as.numeric(as.character(ncontracts$ord))
@@ -260,11 +256,8 @@ ncontracts <- ncontracts%>% filter(ord >= -12 & ord<= 12)
 
 ncontracts<-ncontracts[order(ncontracts$ord),]
 
-ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts, fill=as.factor(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION))) + geom_bar(stat="identity")+  scale_fill_brewer(palette=7)+
+ggplot(data=ncontracts, aes(x=fct_inorder(time), y=numberofcontracts, fill=as.factor(callintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette=7)+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) + labs(title="Monthly Number of Contracts By Call for Tender", x="Dates (unit in Months)", y = "Monthly number of contracts" , subtitle="T = 0 depicts disaster incidence", fill = "1: No call published")
-
-
-##Quarterly Analysis ----
 
 ncontracts<- NULL
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
@@ -272,7 +265,7 @@ ncontracts<- as.data.frame(ncontracts)
 ncontracts$ord<- as.numeric(as.character(ncontracts$ord))
 ncontracts$numberofcontracts<- as.numeric(ncontracts$numberofcontracts)
 
-ncontracts <- ncontracts %>% group_by(time, tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION,time, numberofcontracts, treatcon, ord) %>% distinct()
+ncontracts <- ncontracts %>% group_by(time, callintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(callintegrity,time, numberofcontracts, treatcon, ord) %>% distinct()
 
 ncontracts <- ncontracts%>% filter(ord >= -36 & ord<= 36)
 
@@ -291,11 +284,11 @@ for (j in 1:nrow(k)) {
     if(k$Var1[j]> 0){
       t<- paste0("t+", k$Var1[j])  
     }
-    a<- rbind(a, c(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION = 0, time = t, numberofcontracts = 0,treatcon =1, ord=k$Var1[j]))
+    a<- rbind(a, c(callintegrity = 1, time = t, numberofcontracts = 0,treatcon =1, ord=k$Var1[j]))
   }
 }
 a<- as.data.frame(a)
-a$tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION<- as.numeric(as.character(a$tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION))
+a$callintegrity<- as.numeric(as.character(a$callintegrity))
 a$time<- as.character(a$time)
 a$numberofcontracts<- as.numeric(as.character(a$numberofcontracts))
 a$treatcon<- as.numeric(as.character(a$treatcon))
@@ -329,21 +322,21 @@ for (i in tr:1) {
   }
 }
 
-ncontracts <- ncontracts %>% group_by(date, tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION)%>% mutate(numberofcontracts = round(sum(numberofcontracts),2)) %>% select(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION,date, numberofcontracts, treatcon) %>% distinct()
+ncontracts <- ncontracts %>% group_by(date, callintegrity)%>% mutate(numberofcontracts = round(sum(numberofcontracts),2)) %>% select(callintegrity,date, numberofcontracts, treatcon) %>% distinct()
 
-ncontracts <- ncontracts %>% group_by(date)%>% mutate(share = round(numberofcontracts/sum(numberofcontracts),2)) %>% select(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION,date, numberofcontracts, treatcon, share) %>% distinct()
+ncontracts <- ncontracts %>% group_by(date)%>% mutate(share = round(numberofcontracts/sum(numberofcontracts),2)) %>% select(callintegrity,date, numberofcontracts, treatcon, share) %>% distinct()
 
-ggplot(data=ncontracts, aes(x=fct_inorder(date), y=numberofcontracts, fill=as.factor(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+  theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1))+ labs(title="Quarterly Number of Contracts By Call for Tender", x="Dates (unit in Quarters)", y = "Quarterly Number of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: No call published")
+ggplot(data=ncontracts, aes(x=fct_inorder(date), y=numberofcontracts, fill=as.factor(callintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+  theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1))+ labs(title="Quarterly Number of Contracts By Call for Tender", x="Dates (unit in Quarters)", y = "Quarterly Number of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: No call published")
 
-ggplot(data=ncontracts, aes(x=fct_inorder(date), y=share, fill=as.factor(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+
+ggplot(data=ncontracts, aes(x=fct_inorder(date), y=share, fill=as.factor(callintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) + labs(title="Quarterly Share of Contracts By Call for Tender", x="Dates (unit in Quarters)", y = "Quarterly Share of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: No call published")
 
-##T-tests ----
+
 
 ncontracts_before_3 <- ncontracts[c(1:24),]
 ncontracts_after_3 <- ncontracts[c(27:50),]
-ncontracts_before_3.gr1 <- ncontracts_before_3 %>% filter(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 1)
-ncontracts_after_3.gr1 <- ncontracts_after_3 %>% filter(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 1)
+ncontracts_before_3.gr1 <- ncontracts_before_3 %>% filter(callintegrity == 1)
+ncontracts_after_3.gr1 <- ncontracts_after_3 %>% filter(callintegrity == 1)
 mean(ncontracts_before_3.gr1$share)
 mean(ncontracts_after_3.gr1$share)
 
@@ -353,8 +346,8 @@ t3
 
 ncontracts_before_2 <- ncontracts[c(9:24),]
 ncontracts_after_2 <- ncontracts[c(27:42),]
-ncontracts_before_2.gr1 <- ncontracts_before_2 %>% filter(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 1)
-ncontracts_after_2.gr1 <- ncontracts_after_2 %>% filter(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 1)
+ncontracts_before_2.gr1 <- ncontracts_before_2 %>% filter(callintegrity == 1)
+ncontracts_after_2.gr1 <- ncontracts_after_2 %>% filter(callintegrity == 1)
 mean(ncontracts_before_2.gr1$share)
 mean(ncontracts_after_2.gr1$share)
 
@@ -365,8 +358,8 @@ ncontracts_before_1 <- ncontracts[c(17:24),]
 ncontracts_after_1 <- ncontracts[c(27:34),]
 
 
-ncontracts_before_1.gr1 <- ncontracts_before_1 %>% filter(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 1)
-ncontracts_after_1.gr1 <- ncontracts_after_1 %>% filter(tender_indicator_INTEGRITY_CALL_FOR_TENDER_PUBLICATION == 1)
+ncontracts_before_1.gr1 <- ncontracts_before_1 %>% filter(callintegrity == 1)
+ncontracts_after_1.gr1 <- ncontracts_after_1 %>% filter(callintegrity == 1)
 mean(ncontracts_before_1.gr1$share)
 mean(ncontracts_after_1.gr1$share)
 
@@ -375,4 +368,111 @@ t3
 t2
 t1
 
-t1$statistic
+##Treated Contracts by disaster ----
+italy_disaster1_1 <- italy_disaster1 %>% filter(treatcon == 1)
+italy_disaster1_1$treatmentstatus <- ifelse(is.na(italy_disaster1_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster1_1$tender_publications_firstdContractAwardDate >= disaster1_date - as.difftime(1, unit="days"),1,0),ifelse(italy_disaster1_1$tender_publications_firstCallForTenderDate>= disaster1_date  - as.difftime(1, unit="days"),1,0))
+italy_disaster1_1$ord <- NULL
+for(i in 1:nrow(italy_disaster1_1)){
+  italy_disaster1_1$ord[i] <- round(as.integer(difftime(italy_disaster1_1$Date[i], as.yearmon(disaster1_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster1_1_3 <- italy_disaster1_1 %>%filter(ord <=36 & ord >= - 36)
+italy_disaster1_1_2 <- italy_disaster1_1 %>%filter(ord <=24 & ord >= - 24)
+italy_disaster1_1_1 <- italy_disaster1_1 %>%filter(ord <=12 & ord >= - 12)
+
+italy_disaster2_1 <- italy_disaster2 %>% filter(treatcon == 1)
+italy_disaster2_1$treatmentstatus <- ifelse(is.na(italy_disaster2_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster2_1$tender_publications_firstdContractAwardDate >= disaster2_date,1,0),ifelse(italy_disaster2_1$tender_publications_firstCallForTenderDate >= disaster2_date,1,0))
+italy_disaster2_1$ord <- NULL
+for(i in 1:nrow(italy_disaster2_1)){
+  italy_disaster2_1$ord[i] <- round(as.integer(difftime(italy_disaster2_1$Date[i], as.yearmon(disaster2_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster2_1_3 <- italy_disaster2_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster2_1_2 <- italy_disaster2_1 %>%filter(ord <=24 & ord >= - 24)
+italy_disaster2_1_1 <- italy_disaster2_1 %>%filter(ord <=12 & ord >= - 12)
+
+
+italy_disaster3_1 <- italy_disaster3 %>% filter(treatcon == 1)
+italy_disaster3_1$treatmentstatus <- ifelse(is.na(italy_disaster3_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster3_1$tender_publications_firstdContractAwardDate >= disaster3_date,1,0),ifelse(italy_disaster3_1$tender_publications_firstCallForTenderDate >= disaster3_date,1,0))
+italy_disaster3_1$ord <- NULL
+for(i in 1:nrow(italy_disaster3_1)){
+  italy_disaster3_1$ord[i] <- round(as.integer(difftime(italy_disaster3_1$Date[i], as.yearmon(disaster3_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster3_1_3 <- italy_disaster3_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster3_1_2 <- italy_disaster3_1 %>%filter(ord <=24 & ord >=- 24)
+italy_disaster3_1_1 <- italy_disaster3_1 %>%filter(ord <=12 & ord >=- 12)
+
+
+italy_disaster4_1 <- italy_disaster4 %>% filter(treatcon == 1)
+italy_disaster4_1$treatmentstatus <- ifelse(is.na(italy_disaster4_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster4_1$tender_publications_firstdContractAwardDate >= disaster4_date,1,0),ifelse(italy_disaster4_1$tender_publications_firstCallForTenderDate >= disaster4_date,1,0))
+italy_disaster4_1$ord <- NULL
+for(i in 1:nrow(italy_disaster4_1)){
+  italy_disaster4_1$ord[i] <- round(as.integer(difftime(italy_disaster4_1$Date[i], as.yearmon(disaster4_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster4_1_3 <- italy_disaster4_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster4_1_2 <- italy_disaster4_1 %>%filter(ord <=24 & ord >=- 24)
+italy_disaster4_1_1 <- italy_disaster4_1 %>%filter(ord <=12 & ord >=- 12)
+
+
+italy_disaster5_1 <- italy_disaster5 %>% filter(treatcon == 1)
+italy_disaster5_1$treatmentstatus <- ifelse(is.na(italy_disaster5_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster5_1$tender_publications_firstdContractAwardDate >= disaster5_date,1,0),ifelse(italy_disaster5_1$tender_publications_firstCallForTenderDate >= disaster5_date,1,0))
+italy_disaster5_1$ord <- NULL
+for(i in 1:nrow(italy_disaster5_1)){
+  italy_disaster5_1$ord[i] <- round(as.integer(difftime(italy_disaster5_1$Date[i], as.yearmon(disaster5_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster5_1_3 <- italy_disaster5_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster5_1_2 <- italy_disaster5_1 %>%filter(ord <=24 & ord >=- 24)
+italy_disaster5_1_1 <- italy_disaster5_1 %>%filter(ord <=12 & ord >=- 12)
+
+##3 year Regressions ----
+italy_reg3<- rbind(italy_disaster1_1_3,italy_disaster2_1_3,italy_disaster3_1_3,italy_disaster4_1_3, italy_disaster5_1_3)
+italy_reg3$contractvalue <- ifelse(is.na(italy_reg3$tender_finalPrice_EUR), ifelse(is.na(italy_reg3$tender_estimatedPrice_EUR),"",italy_reg3$tender_estimatedPrice_EUR),italy_reg3$tender_finalPrice_EUR)
+italy_reg3$log_contractvalue <- log(as.numeric(as.character(italy_reg3$contractvalue)))
+
+f<- chisq.test(italy_reg3$treatmentstatus, italy_reg3$callintegrity, correct = FALSE)
+f
+f$observed
+
+model3_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg3)
+summary.glm(model3_logit)
+RsqGLM(model3_logit)
+
+model3_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue, data = italy_reg3)
+summary.lm(model3_ols)
+
+##2 year Regressions ----
+italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
+italy_reg2$contractvalue <- ifelse(is.na(italy_reg2$tender_finalPrice_EUR), ifelse(is.na(italy_reg2$tender_estimatedPrice_EUR),"",italy_reg2$tender_estimatedPrice_EUR),italy_reg2$tender_finalPrice_EUR)
+italy_reg2$log_contractvalue <- log(as.numeric(as.character(italy_reg2$contractvalue)))
+
+f<- chisq.test(italy_reg2$treatmentstatus, italy_reg2$callintegrity, correct = FALSE)
+f
+f$observed
+
+model2_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg2)
+summary.glm(model2_logit)
+RsqGLM(model2_logit)
+
+model2_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg2)
+summary.lm(model2_ols)
+
+##1 year Regressions ----
+italy_reg1<- rbind(italy_disaster1_1_1,italy_disaster2_1_1,italy_disaster3_1_1,italy_disaster4_1_1, italy_disaster5_1_1)
+italy_reg1$contractvalue <- ifelse(is.na(italy_reg1$tender_finalPrice_EUR), ifelse(is.na(italy_reg1$tender_estimatedPrice_EUR),"",italy_reg1$tender_estimatedPrice_EUR),italy_reg1$tender_finalPrice_EUR)
+italy_reg1$log_contractvalue <- log(as.numeric(as.character(italy_reg1$contractvalue)))
+
+f<- chisq.test(italy_reg1$treatmentstatus, italy_reg1$callintegrity, correct = FALSE)
+f
+f$observed
+
+model1_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg1)
+summary.glm(model1_logit)
+RsqGLM(model1_logit)
+
+model1_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg1)
+summary.lm(model1_ols)
+
+
