@@ -12,6 +12,8 @@ library(forcats)
 library(reshape2)
 library(stargazer)
 library(broom)
+library(modEvA)
+
 
 memory.limit(size = 30000)
 gc()
@@ -176,7 +178,7 @@ ncontracts5 <- italy_disaster5 %>% filter(treatcon == 1) %>% group_by(Date, trea
 
 
 ##Declaring new variables for time and order
-ncontracts2$time <- NA
+ncontracts2$time <- NULL
 ncontracts3$time <- NA
 ncontracts4$time <- NA
 ncontracts4$time <- NA
@@ -391,32 +393,143 @@ t2
 
 ncontracts_before_1 <- ncontracts[c(17:24),]
 ncontracts_after_1 <- ncontracts[c(27:34),]
-ncontracts_before_1.gr1 <- ncontracts_before_1 %>% filter(singlebidintegrity == 1)
-ncontracts_after_1.gr1 <- ncontracts_after_1 %>% filter(singlebidintegrity == 1)
 mean(ncontracts_before_1.gr1$share)
 mean(ncontracts_after_1.gr1$share)
+
+ncontracts_before_1.gr1 <- ncontracts_before_1 %>% filter(singlebidintegrity == 1)
+ncontracts_after_1.gr1 <- ncontracts_after_1 %>% filter(singlebidintegrity == 1)
 
 t1<-t.test(ncontracts_before_1.gr1$share , ncontracts_after_1.gr1$share, paired = TRUE, conf.level = 0.95)
 t3
 t2
 t1
 
-italy_reg<- italy
-italy_reg$log_tender_finalPrice_EUR <- log(italy_reg$tender_finalPrice_EUR)
-italy_reg$two_tender_mainCpv <- as.integer(italy_reg$tender_mainCpv)
-italy_reg$two_tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_reg$two_tender_mainCpv)
-italy_reg$two_tender_mainCpv <- as.integer(italy_reg$two_tender_mainCpv)
-italy_reg$contractyear<- ifelse(is.na(italy_reg$tender_publications_firstCallForTenderDate), substring(italy_reg$tender_publications_firstdContractAwardDate,1,4),substring(italy_reg$tender_publications_firstCallForTenderDate,1,4)) #Contract year
-italy_reg <- subset(italy_reg, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 
-model1 <- glm(singlebidintegrity ~ treatcon + log_tender_finalPrice_EUR + factor(two_tender_mainCpv)+ buyer_buyerType + contractyear, family = "binomial", data = italy_reg)
-sum<-summary.lm(model1)
+##Treated Contracts by disaster ----
+italy_disaster1_1 <- italy_disaster1 %>% filter(treatcon == 1)
+italy_disaster1_1$treatmentstatus <- ifelse(is.na(italy_disaster1_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster1_1$tender_publications_firstdContractAwardDate >= disaster1_date - as.difftime(1, unit="days"),1,0),ifelse(italy_disaster1_1$tender_publications_firstCallForTenderDate>= disaster1_date  - as.difftime(1, unit="days"),1,0))
+italy_disaster1_1$ord <- NULL
+for(i in 1:nrow(italy_disaster1_1)){
+  italy_disaster1_1$ord[i] <- round(as.integer(difftime(italy_disaster1_1$Date[i], as.yearmon(disaster1_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster1_1_3 <- italy_disaster1_1 %>%filter(ord <=36 & ord >= - 36)
+italy_disaster1_1_2 <- italy_disaster1_1 %>%filter(ord <=24 & ord >= - 24)
+italy_disaster1_1_1 <- italy_disaster1_1 %>%filter(ord <=12 & ord >= - 12)
 
-sum$coefficients <- sum$coefficients[1:2,]
+italy_disaster2_1 <- italy_disaster2 %>% filter(treatcon == 1)
+italy_disaster2_1$treatmentstatus <- ifelse(is.na(italy_disaster2_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster2_1$tender_publications_firstdContractAwardDate >= disaster2_date,1,0),ifelse(italy_disaster2_1$tender_publications_firstCallForTenderDate >= disaster2_date,1,0))
+italy_disaster2_1$ord <- NULL
+for(i in 1:nrow(italy_disaster2_1)){
+  italy_disaster2_1$ord[i] <- round(as.integer(difftime(italy_disaster2_1$Date[i], as.yearmon(disaster2_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster2_1_3 <- italy_disaster2_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster2_1_2 <- italy_disaster2_1 %>%filter(ord <=24 & ord >= - 24)
+italy_disaster2_1_1 <- italy_disaster2_1 %>%filter(ord <=12 & ord >= - 12)
 
-print(sum)
 
-model2<- lm(singlebidintegrity ~ treatcon + log_tender_finalPrice_EUR + factor(two_tender_mainCpv)  + buyer_buyerType + contractyear, data = italy_reg)
-summary(model2)
+italy_disaster3_1 <- italy_disaster3 %>% filter(treatcon == 1)
+italy_disaster3_1$treatmentstatus <- ifelse(is.na(italy_disaster3_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster3_1$tender_publications_firstdContractAwardDate >= disaster3_date,1,0),ifelse(italy_disaster3_1$tender_publications_firstCallForTenderDate >= disaster3_date,1,0))
+italy_disaster3_1$ord <- NULL
+for(i in 1:nrow(italy_disaster3_1)){
+  italy_disaster3_1$ord[i] <- round(as.integer(difftime(italy_disaster3_1$Date[i], as.yearmon(disaster3_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster3_1_3 <- italy_disaster3_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster3_1_2 <- italy_disaster3_1 %>%filter(ord <=24 & ord >=- 24)
+italy_disaster3_1_1 <- italy_disaster3_1 %>%filter(ord <=12 & ord >=- 12)
 
-stargazer(model1, type='latex', summary=FALSE)
+
+italy_disaster4_1 <- italy_disaster4 %>% filter(treatcon == 1)
+italy_disaster4_1$treatmentstatus <- ifelse(is.na(italy_disaster4_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster4_1$tender_publications_firstdContractAwardDate >= disaster4_date,1,0),ifelse(italy_disaster4_1$tender_publications_firstCallForTenderDate >= disaster4_date,1,0))
+italy_disaster4_1$ord <- NULL
+for(i in 1:nrow(italy_disaster4_1)){
+  italy_disaster4_1$ord[i] <- round(as.integer(difftime(italy_disaster4_1$Date[i], as.yearmon(disaster4_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster4_1_3 <- italy_disaster4_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster4_1_2 <- italy_disaster4_1 %>%filter(ord <=24 & ord >=- 24)
+italy_disaster4_1_1 <- italy_disaster4_1 %>%filter(ord <=12 & ord >=- 12)
+
+
+italy_disaster5_1 <- italy_disaster5 %>% filter(treatcon == 1)
+italy_disaster5_1$treatmentstatus <- ifelse(is.na(italy_disaster5_1$tender_publications_firstCallForTenderDate), ifelse(italy_disaster5_1$tender_publications_firstdContractAwardDate >= disaster5_date,1,0),ifelse(italy_disaster5_1$tender_publications_firstCallForTenderDate >= disaster5_date,1,0))
+italy_disaster5_1$ord <- NULL
+for(i in 1:nrow(italy_disaster5_1)){
+  italy_disaster5_1$ord[i] <- round(as.integer(difftime(italy_disaster5_1$Date[i], as.yearmon(disaster5_date, units = "weeks")))/31,0)
+  
+}
+italy_disaster5_1_3 <- italy_disaster5_1 %>%filter(ord <=36 & ord >=- 36)
+italy_disaster5_1_2 <- italy_disaster5_1 %>%filter(ord <=24 & ord >=- 24)
+italy_disaster5_1_1 <- italy_disaster5_1 %>%filter(ord <=12 & ord >=- 12)
+
+##3 year Regressions ----
+italy_reg3<- rbind(italy_disaster1_1_3,italy_disaster2_1_3,italy_disaster3_1_3,italy_disaster4_1_3, italy_disaster5_1_3)
+italy_reg3$contractvalue <- ifelse(is.na(italy_reg3$tender_finalPrice_EUR), ifelse(is.na(italy_reg3$tender_estimatedPrice_EUR),"",italy_reg3$tender_estimatedPrice_EUR),italy_reg3$tender_finalPrice_EUR)
+italy_reg3$log_contractvalue <- log(as.numeric(as.character(italy_reg3$contractvalue)))
+
+italy_reg3<- italy_reg3 %>% filter(!is.na(log_contractvalue))
+
+f<- chisq.test(italy_reg3$treatmentstatus, italy_reg3$singlebidintegrity, correct = FALSE)
+f
+f$observed
+
+model3_logit<- glm(singlebidintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg3)
+summary.glm(model3_logit)
+RsqGLM(model3_logit)
+
+
+model3_ols<- lm(singlebidintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue, data = italy_reg3)
+summary.lm(model3_ols)
+
+##2 year Regressions ----
+italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
+italy_reg2$contractvalue <- ifelse(is.na(italy_reg2$tender_finalPrice_EUR), ifelse(is.na(italy_reg2$tender_estimatedPrice_EUR),"",italy_reg2$tender_estimatedPrice_EUR),italy_reg2$tender_finalPrice_EUR)
+italy_reg2$log_contractvalue <- log(as.numeric(as.character(italy_reg2$contractvalue)))
+
+italy_reg2<- italy_reg2 %>% filter(!is.na(log_contractvalue))
+
+colSums(is.na(italy_reg2))
+
+f<- chisq.test(italy_reg2$treatmentstatus, italy_reg2$singlebidintegrity, correct = FALSE)
+f
+f$observed
+
+model2_logit<- glm(singlebidintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg2)
+
+
+summary.glm(model2_logit)
+RsqGLM(model2_logit)
+
+model2_ols<- lm(singlebidintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg2)
+summary.lm(model2_ols)
+
+##1 year Regressions ----
+italy_reg1<- rbind(italy_disaster1_1_1,italy_disaster2_1_1,italy_disaster3_1_1,italy_disaster4_1_1, italy_disaster5_1_1)
+italy_reg1$contractvalue <- ifelse(is.na(italy_reg1$tender_finalPrice_EUR), ifelse(is.na(italy_reg1$tender_estimatedPrice_EUR),"",italy_reg1$tender_estimatedPrice_EUR),italy_reg1$tender_finalPrice_EUR)
+italy_reg1$log_contractvalue <- log(as.numeric(as.character(italy_reg1$contractvalue)))
+italy_reg1<- italy_reg1 %>% filter(!is.na(log_contractvalue))
+f<- chisq.test(italy_reg1$treatmentstatus, italy_reg1$singlebidintegrity, correct = FALSE)
+f
+f$observed
+
+model1_logit<- glm(singlebidintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg1)
+summary.glm(model1_logit)
+RsqGLM(model1_logit)
+
+model1_ols<- lm(singlebidintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg1)
+summary.lm(model1_ols)
+
+
+##Average number of bidders ----
+italy_reg3$bidders <- ifelse(italy_reg3$lot_bidsCount >= 20, 20, italy_reg3$lot_bidsCount)
+italy_reg2$bidders <- ifelse(italy_reg2$lot_bidsCount >= 20, 20, italy_reg2$lot_bidsCount)
+italy_reg1$bidders <- ifelse(italy_reg1$lot_bidsCount >= 20, 20, italy_reg1$lot_bidsCount)
+
+model3_logit_avg<- lm(bidders ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg1)
+summary.lm(model3_logit_avg)
+
+
+
+

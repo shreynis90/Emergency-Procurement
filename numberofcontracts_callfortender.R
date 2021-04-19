@@ -431,7 +431,7 @@ italy_disaster5_1_1 <- italy_disaster5_1 %>%filter(ord <=12 & ord >=- 12)
 italy_reg3<- rbind(italy_disaster1_1_3,italy_disaster2_1_3,italy_disaster3_1_3,italy_disaster4_1_3, italy_disaster5_1_3)
 italy_reg3$contractvalue <- ifelse(is.na(italy_reg3$tender_finalPrice_EUR), ifelse(is.na(italy_reg3$tender_estimatedPrice_EUR),"",italy_reg3$tender_estimatedPrice_EUR),italy_reg3$tender_finalPrice_EUR)
 italy_reg3$log_contractvalue <- log(as.numeric(as.character(italy_reg3$contractvalue)))
-
+italy_reg3 <- italy_reg3 %>% filter(!is.na(log_contractvalue))
 f<- chisq.test(italy_reg3$treatmentstatus, italy_reg3$callintegrity, correct = FALSE)
 f
 f$observed
@@ -440,14 +440,14 @@ model3_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyea
 summary.glm(model3_logit)
 RsqGLM(model3_logit)
 
-model3_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue, data = italy_reg3)
+model3_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg3)
 summary.lm(model3_ols)
 
 ##2 year Regressions ----
 italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
 italy_reg2$contractvalue <- ifelse(is.na(italy_reg2$tender_finalPrice_EUR), ifelse(is.na(italy_reg2$tender_estimatedPrice_EUR),"",italy_reg2$tender_estimatedPrice_EUR),italy_reg2$tender_finalPrice_EUR)
 italy_reg2$log_contractvalue <- log(as.numeric(as.character(italy_reg2$contractvalue)))
-
+italy_reg2 <- italy_reg2 %>% filter(!is.na(log_contractvalue))
 f<- chisq.test(italy_reg2$treatmentstatus, italy_reg2$callintegrity, correct = FALSE)
 f
 f$observed
@@ -467,7 +467,7 @@ italy_reg1$log_contractvalue <- log(as.numeric(as.character(italy_reg1$contractv
 f<- chisq.test(italy_reg1$treatmentstatus, italy_reg1$callintegrity, correct = FALSE)
 f
 f$observed
-
+italy_reg1 <- italy_reg1 %>% filter(!is.na(log_contractvalue))
 model1_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg1)
 summary.glm(model1_logit)
 RsqGLM(model1_logit)

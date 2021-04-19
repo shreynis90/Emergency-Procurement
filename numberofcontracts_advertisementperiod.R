@@ -435,12 +435,32 @@ italy_disaster5_1_1 <- italy_disaster5_1 %>%filter(ord <=12 & ord >=- 12)
 italy_reg3<- rbind(italy_disaster1_1_3,italy_disaster2_1_3,italy_disaster3_1_3,italy_disaster4_1_3, italy_disaster5_1_3)
 italy_reg3$contractvalue <- ifelse(is.na(italy_reg3$tender_finalPrice_EUR), ifelse(is.na(italy_reg3$tender_estimatedPrice_EUR),"",italy_reg3$tender_estimatedPrice_EUR),italy_reg3$tender_finalPrice_EUR)
 italy_reg3$log_contractvalue <- log(as.numeric(as.character(italy_reg3$contractvalue)))
-
+italy_reg3 <- italy_reg3 %>% filter(!is.na(log_contractvalue))
 f<- chisq.test(italy_reg3$treatmentstatus, italy_reg3$advertintegrity, correct = FALSE)
 f
 f$observed
 
-model3_logit<- glm(advertintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg3)
+q3<- as.data.frame(table(italy_reg3$tender_mainCpv))
+q3$Freq
+
+cpv_list3 <- as.data.frame(q3$Var1[which(q3$Freq>= 200)])
+
+italy_reg3$newcpv<- NA
+for(i in 1:nrow(italy_reg3)){
+  for(j in 1:nrow(cpv_list3)){
+    if(italy_reg3$tender_mainCpv[i] == cpv_list3[j,1]){
+      italy_reg3$newcpv[i] <- italy_reg3$tender_mainCpv[i]
+      break
+    }
+    if(italy_reg3$tender_mainCpv[i] != cpv_list3[j,1]){
+      italy_reg3$newcpv[i] <- "Other"
+    }
+  }
+}
+
+
+
+model3_logit<- glm(advertintegrity ~ treatmentstatus + factor(tender_mainCpv) + buyer_buyerType+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg3)
 summary.glm(model3_logit)
 RsqGLM(model3_logit)
 
@@ -451,23 +471,23 @@ summary.lm(model3_ols)
 italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
 italy_reg2$contractvalue <- ifelse(is.na(italy_reg2$tender_finalPrice_EUR), ifelse(is.na(italy_reg2$tender_estimatedPrice_EUR),"",italy_reg2$tender_estimatedPrice_EUR),italy_reg2$tender_finalPrice_EUR)
 italy_reg2$log_contractvalue <- log(as.numeric(as.character(italy_reg2$contractvalue)))
-
+italy_reg2 <- italy_reg2 %>% filter(!is.na(log_contractvalue))
 f<- chisq.test(italy_reg2$treatmentstatus, italy_reg2$advertintegrity, correct = FALSE)
 f
 f$observed
 
-model2_logit<- glm(advertintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg2)
+model2_logit<- glm(advertintegrity ~ treatmentstatus + log_contractvalue + contractyear + contractmonth + factor(tender_mainCpv) + buyer_buyerType, family ="binomial", data = italy_reg2)
 summary.glm(model2_logit)
 RsqGLM(model2_logit)
 
-model2_ols<- lm(advertintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg2)
+model2_ols<- lm(advertintegrity ~ treatmentstatus + factor(tender_mainCpv) + contractyear + contractmonth + log_contractvalue + buyer_buyerType, data = italy_reg2)
 summary.lm(model2_ols)
 
 ##1 year Regressions ----
 italy_reg1<- rbind(italy_disaster1_1_1,italy_disaster2_1_1,italy_disaster3_1_1,italy_disaster4_1_1, italy_disaster5_1_1)
 italy_reg1$contractvalue <- ifelse(is.na(italy_reg1$tender_finalPrice_EUR), ifelse(is.na(italy_reg1$tender_estimatedPrice_EUR),"",italy_reg1$tender_estimatedPrice_EUR),italy_reg1$tender_finalPrice_EUR)
 italy_reg1$log_contractvalue <- log(as.numeric(as.character(italy_reg1$contractvalue)))
-
+italy_reg1 <- italy_reg1 %>% filter(!is.na(log_contractvalue))
 f<- chisq.test(italy_reg1$treatmentstatus, italy_reg1$advertintegrity, correct = FALSE)
 f
 f$observed
