@@ -436,12 +436,43 @@ f<- chisq.test(italy_reg3$treatmentstatus, italy_reg3$callintegrity, correct = F
 f
 f$observed
 
-model3_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg3)
+q3<- as.data.frame(table(italy_reg3$tender_mainCpv))
+q3$Freq
+
+cpv_list3 <- as.data.frame(q3$Var1[which(q3$Freq>= 1000)])
+
+italy_reg3$newcpv<- NA
+for(i in 1:nrow(italy_reg3)){
+  for(j in 1:nrow(cpv_list3)){
+    if(italy_reg3$tender_mainCpv[i] == cpv_list3[j,1]){
+      italy_reg3$newcpv[i] <- italy_reg3$tender_mainCpv[i]
+      break
+    }
+    if(italy_reg3$tender_mainCpv[i] != cpv_list3[j,1]){
+      italy_reg3$newcpv[i] <- "Other"
+    }
+  }
+}
+
+italy_reg3$buyer<- ifelse(italy_reg3$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg3$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
+
+write.csv(italy_reg3,"temp3.csv")
+
+model3_logit<- glm(callintegrity ~ treatmentstatus + factor(tender_mainCpv) + buyer_buyerType+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg3)
 summary.glm(model3_logit)
 RsqGLM(model3_logit)
 
 model3_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg3)
 summary.lm(model3_ols)
+
+model3_logit_small<- glm(callintegrity ~ treatmentstatus + factor(newcpv) + buyer + log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg3)
+summary.glm(model3_logit_small)
+RsqGLM(model3_logit_small)
+
+
+model3_ols_small<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue, data = italy_reg3)
+summary.lm(model3_ols_small)
+
 
 ##2 year Regressions ----
 italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
@@ -452,12 +483,41 @@ f<- chisq.test(italy_reg2$treatmentstatus, italy_reg2$callintegrity, correct = F
 f
 f$observed
 
+q2<- as.data.frame(table(italy_reg2$tender_mainCpv))
+q2$Freq
+
+cpv_list2 <- as.data.frame(q2$Var1[which(q2$Freq>= 1000)])
+
+italy_reg2$newcpv<- NA
+for(i in 1:nrow(italy_reg2)){
+  for(j in 1:nrow(cpv_list2)){
+    if(italy_reg2$tender_mainCpv[i] == cpv_list2[j,1]){
+      italy_reg2$newcpv[i] <- italy_reg2$tender_mainCpv[i]
+      break
+    }
+    if(italy_reg2$tender_mainCpv[i] != cpv_list2[j,1]){
+      italy_reg2$newcpv[i] <- "Other"
+    }
+  }
+}
+
+italy_reg2$buyer<- ifelse(italy_reg2$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg2$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
+
+write.csv(italy_reg2,"temp2.csv")
+
 model2_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg2)
 summary.glm(model2_logit)
 RsqGLM(model2_logit)
 
 model2_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg2)
 summary.lm(model2_ols)
+
+model2_logit_small<- glm(callintegrity ~ treatmentstatus + log_contractvalue + contractyear + contractmonth + factor(newcpv) + buyer, family ="binomial", data = italy_reg2)
+summary.glm(model2_logit_small)
+RsqGLM(model2_logit_small)
+
+model2_ols_small<- lm(callintegrity ~ treatmentstatus + factor(newcpv) + contractyear + contractmonth + log_contractvalue + buyer, data = italy_reg2)
+summary.lm(model2_ols_small)
 
 ##1 year Regressions ----
 italy_reg1<- rbind(italy_disaster1_1_1,italy_disaster2_1_1,italy_disaster3_1_1,italy_disaster4_1_1, italy_disaster5_1_1)
@@ -467,6 +527,29 @@ italy_reg1$log_contractvalue <- log(as.numeric(as.character(italy_reg1$contractv
 f<- chisq.test(italy_reg1$treatmentstatus, italy_reg1$callintegrity, correct = FALSE)
 f
 f$observed
+
+q1<- as.data.frame(table(italy_reg1$tender_mainCpv))
+q1$Freq
+
+cpv_list1 <- as.data.frame(q1$Var1[which(q1$Freq>= 500)])
+
+italy_reg1$newcpv<- NA
+for(i in 1:nrow(italy_reg1)){
+  for(j in 1:nrow(cpv_list1)){
+    if(italy_reg1$tender_mainCpv[i] == cpv_list1[j,1]){
+      italy_reg1$newcpv[i] <- italy_reg1$tender_mainCpv[i]
+      break
+    }
+    if(italy_reg1$tender_mainCpv[i] != cpv_list1[j,1]){
+      italy_reg1$newcpv[i] <- "Other"
+    }
+  }
+}
+
+italy_reg1$buyer<- ifelse(italy_reg1$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg1$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
+
+write.csv(italy_reg1,"temp1.csv")
+
 italy_reg1 <- italy_reg1 %>% filter(!is.na(log_contractvalue))
 model1_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg1)
 summary.glm(model1_logit)
@@ -474,5 +557,13 @@ RsqGLM(model1_logit)
 
 model1_ols<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg1)
 summary.lm(model1_ols)
+
+model1_logit_small<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue + buyer, family ="binomial", data = italy_reg1)
+summary.glm(model1_logit_small)
+RsqGLM(model1_logit_small)
+
+model1_ols_small<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue + buyer, data = italy_reg1)
+summary.lm(model1_ols_small)
+
 
 
