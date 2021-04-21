@@ -550,8 +550,6 @@ for(i in 1:nrow(italy_reg1)){
 
 italy_reg1$buyer<- ifelse(italy_reg1$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg1$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
 
-write.csv(italy_reg1,"temp1.csv")
-
 model1_logit<- glm(advertintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg1)
 summary.glm(model1_logit)
 RsqGLM(model1_logit)
