@@ -254,14 +254,4 @@ model1_ols<- lm(totalbidders ~ treatmentstatus + contractmonth + contractyear + 
 summary.lm(model1_ols)
 
 
-##Average number of bidders ----
-italy_reg3$bidders <- ifelse(italy_reg3$lot_bidsCount >= 20, 20, italy_reg3$lot_bidsCount)
-italy_reg2$bidders <- ifelse(italy_reg2$lot_bidsCount >= 20, 20, italy_reg2$lot_bidsCount)
-italy_reg1$bidders <- ifelse(italy_reg1$lot_bidsCount >= 20, 20, italy_reg1$lot_bidsCount)
-
-model3_logit_avg<- lm(bidders ~ treatmentstatus + contractmonth + contractyear + factor(cpv) + log_contractvalue + buyer_buyerType, data = italy_reg3)
-summary.lm(model3_logit_avg)
-
-
-
 
