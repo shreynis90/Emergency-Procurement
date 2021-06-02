@@ -7,6 +7,7 @@ library(openxlsx)
 library(data.table)
 library(lubridate)
 library(compare)
+library(stringi)
 memory.limit(size = 30000)
 gc()
 italy<- read_excel("data_09_20.xlsx")
@@ -25,9 +26,14 @@ italy_temp <- italy %>% filter(contractDate> as.POSIXct("2011-01-01", "%Y-%m-%d"
 diff<- median(round(difftime(italy_temp$tender_bidDeadline, italy_temp$tender_publications_firstCallForTenderDate, units = "days"),0), na.rm =  TRUE)
 
 
+
+
 ##Replacing the date with fresh date for all the contracts before 2011
 italy$tender_publications_firstCallForTenderDate <- fifelse(italy$contractDate<"2011-01-01", italy$tender_bidDeadline - days(diff), italy$tender_publications_firstCallForTenderDate)
 italy<- italy %>% filter(contractDate> as.POSIXct("2000-01-01", "%Y-%m-%d",tz="GMT"))
+
+italy$buyer_name <- stri_trans_general(italy$buyer_name,id = "latin-ascii")
+italy$buyer_name <- stri_trans_tolower(italy$buyer_name,locale = NULL)
 
 
 ##Disaster1 Analysis##----
@@ -62,7 +68,6 @@ disaster1_date <- as.POSIXct("2009-10-02")
 italy_disaster1 <- subset(italy_disaster1, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011)) 
 
 
-##Pretreatment average of the dependent variable
 italy_disaster1 <- italy_disaster1 %>% #Dropping the Contracts that are missing the number of bidders 
   filter(!is.na(lot_bidsCount))
 italy_disaster1$lot_bidsCount <- ifelse(italy_disaster1$lot_bidsCount > 20, 20, italy_disaster1$lot_bidsCount)
@@ -71,9 +76,27 @@ italy_disaster1$lot_bidsCount <- ifelse(italy_disaster1$lot_bidsCount > 20, 20, 
 ## Disaster 1 Pretreatment ----
 
 disaster1_pretreat0 <-  italy_disaster1 %>% filter(disaster1_date - as.difftime(1, unit="days") > italy_disaster1$contractdate_final)
+disaster1_posttreat0 <- anti_join(italy_disaster1, disaster1_pretreat0)
 
-disaster1_pretreat <- disaster1_pretreat0 %>% group_by(buyer_id) %>% mutate(meanlotbids = mean(lot_bidsCount)) #pretreament average of the number of bidders
+d1name<-as.data.frame(disaster1_pretreat0$buyer_name)
+d1name <- distinct(d1name) 
 
+d1namepost<-as.data.frame(disaster1_posttreat0$buyer_name)
+d1namepost <- distinct(d1namepost)
+
+names(d1name)[1]<-paste("buyer_name")
+names(d1namepost)[1]<-paste("buyer_name")
+
+common1_0 <- intersect(d1name, d1namepost)
+
+disaster1_pretreat_1<- inner_join(common1_0, disaster1_pretreat0, by= "buyer_name")
+disaster1_pretreat <- disaster1_pretreat_1 %>% group_by(buyer_name) %>% mutate(meanlotbids = mean(lot_bidsCount)) #pretreament average of the number of bidders
+common1_1<- cbind.data.frame(disaster1_pretreat$buyer_name, disaster1_pretreat$meanlotbids)
+common1_1<- distinct(common1_1)
+names(common1_1)[1]<-paste("buyer_name")
+names(common1_1)[2]<-paste("meanlotbids")
+
+disaster1_posttreat<- inner_join(common1_1, disaster1_posttreat0, by= "buyer_name")
 
 disaster1_pretreat$contractyear <- as.factor(disaster1_pretreat$contractyear)
 disaster1_pretreat$contractvalue <- ifelse(is.na(disaster1_pretreat$tender_finalPrice_EUR), ifelse(is.na(disaster1_pretreat$tender_estimatedPrice_EUR),"",disaster1_pretreat$tender_estimatedPrice_EUR),disaster1_pretreat$tender_finalPrice_EUR)
@@ -90,7 +113,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue","contractyear
 temp1_0<- as.data.frame(temp1_0)
 imbalance(group=temp1_0$treatcon, data=temp1_0[vars2])
 summary(temp1_0$log_contractvalue)
-valuecuts = c(13.021, 13.944, 15.084)
+valuecuts = c(13.944)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat1_0 <- cem(treatment = "treatcon", data = temp1_0, drop = "lot_bidsCount", cutpoints = list(log_contractvalue= valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat1_0
@@ -102,13 +125,8 @@ disaster1_pretreat$aftermatchweight <- mat1_0$w
 disaster1_pretreat_final <- disaster1_pretreat %>% filter(aftermatchtreat == TRUE)
 disaster1_pretreat_final$timing <- 0
 
-pretreatavg1 <- mean(disaster1_pretreat_final$meanlotbids)
 
 ###Disaster1 Postreatment ----
-disaster1_posttreat0 <- anti_join(italy_disaster1, disaster1_pretreat0)
-#disaster1_posttreat <- disaster1_posttreat0 %>% group_by(buyer_id) %>% mutate(meanlotbids = mean(lot_bidsCount)) #pretreament average of the number of bidders
-disaster1_posttreat$meanlotbids <- pretreatavg1 
-
 disaster1_posttreat$contractyear <- as.factor(disaster1_posttreat$contractyear)
 disaster1_posttreat$contractvalue <- ifelse(is.na(disaster1_posttreat$tender_finalPrice_EUR), ifelse(is.na(disaster1_posttreat$tender_estimatedPrice_EUR),"",disaster1_posttreat$tender_estimatedPrice_EUR),disaster1_posttreat$tender_finalPrice_EUR)
 disaster1_posttreat$log_contractvalue <- log(as.numeric(as.character(disaster1_posttreat$contractvalue)))
@@ -124,7 +142,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue", "meanlotbids
 temp1_1<- as.data.frame(temp1_1)
 imbalance(group=temp1_1$treatcon, data=temp1_1[vars2])
 summary(temp1_1$log_contractvalue)
-valuecuts = c(13.269, 14.276, 15.561)
+valuecuts = c(14.192)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat1_1 <- cem(treatment = "treatcon", data = temp1_1, drop = "lot_bidsCount", grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat1_1
@@ -135,7 +153,8 @@ disaster1_posttreat$aftermatchweight <- mat1_1$w
 disaster1_posttreat_final <- disaster1_posttreat %>% filter(aftermatchtreat == TRUE)
 disaster1_posttreat_final$timing <- 1
 
-disaster1_matched <- rbind(disaster1_pretreat_final, disaster1_posttreat_final)
+disaster1_matched <- rbind(as.data.frame(disaster1_pretreat_final), as.data.frame(disaster1_posttreat_final))
+disaster1_matched<- as.data.frame(disaster1_matched)
 disaster1_matched$did <- disaster1_matched$treatcon*disaster1_matched$timing
 disaster1_matched$matchsource <- "d1"
 
@@ -183,7 +202,27 @@ italy_disaster2$contractyear <- as.numeric(italy_disaster2$contractyear)
 ## Disaster 2 Pretreatment ----
 
 disaster2_pretreat0 <-  italy_disaster2 %>% filter(disaster2_date > contractdate_final)
-disaster2_pretreat <- disaster2_pretreat0 %>% group_by(buyer_id) %>% mutate(meanlotbids = mean(lot_bidsCount)) #pretreament average of the number of bidders
+disaster2_posttreat0 <- anti_join(italy_disaster2, disaster2_pretreat0)
+
+d2name<-as.data.frame(disaster2_pretreat0$buyer_name)
+d2name <- distinct(d2name) 
+
+d2namepost<-as.data.frame(disaster2_posttreat0$buyer_name)
+d2namepost <- distinct(d2namepost)
+
+names(d2name)[1]<-paste("buyer_name")
+names(d2namepost)[1]<-paste("buyer_name")
+
+common2_0 <- intersect(d2name, d2namepost)
+
+disaster2_pretreat_1<- inner_join(common2_0, disaster2_pretreat0, by= "buyer_name")
+disaster2_pretreat <- disaster2_pretreat_1 %>% group_by(buyer_name) %>% mutate(meanlotbids = mean(lot_bidsCount)) #pretreament average of the number of bidders
+common2_1<- cbind.data.frame(disaster2_pretreat$buyer_name, disaster2_pretreat$meanlotbids)
+common2_1<- distinct(common2_1)
+names(common2_1)[1]<-paste("buyer_name")
+names(common2_1)[2]<-paste("meanlotbids")
+
+disaster2_posttreat<- inner_join(common2_1, disaster2_posttreat0, by= "buyer_name")
 
 
 disaster2_pretreat$contractyear <- as.factor(disaster2_pretreat$contractyear)
@@ -202,7 +241,7 @@ vars3<- c("log_contractvalue","meanlotbids","contractyear","tender_mainCpv")
 temp2_0<- as.data.frame(temp2_0)
 imbalance(group=temp2_0$treatcon, data=temp2_0[vars2])
 summary(temp2_0$log_contractvalue)
-valuecuts = c(13.098, 14.109, 15.189)
+valuecuts = c(14.109)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat2_0 <- cem(treatment = "treatcon", data = temp2_0, drop = "lot_bidsCount", cutpoints = list(log_contractvalue= valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat2_0
@@ -215,8 +254,7 @@ disaster2_pretreat_final$timing <- 0
 
 
 ###Disaster2 Postreatment ----
-disaster2_posttreat <- anti_join(italy_disaster2, disaster2_pretreat0)
-disaster2_posttreat <- disaster2_posttreat %>% group_by(buyer_id) %>% mutate(meanlotbids = mean(lot_bidsCount)) #pretreament average of the number of bidders
+
 
 
 disaster2_posttreat$contractyear <- as.factor(disaster2_posttreat$contractyear)
@@ -234,7 +272,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue", "meanlotbids
 temp2_1<- as.data.frame(temp2_1)
 imbalance(group=temp2_1$treatcon, data=temp2_1[vars2])
 summary(temp2_1$log_contractvalue)
-valuecuts = c(13.30, 14.32, 15.61)
+valuecuts = c(14.25)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat2_1 <- cem(treatment = "treatcon", data = temp2_1, drop = "lot_bidsCount", cutpoints = list(log_contractvalue= valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat2_1
@@ -244,11 +282,11 @@ disaster2_posttreat$aftermatchtreat <- mat2_1$matched
 disaster2_posttreat$aftermatchweight <- mat2_1$w
 disaster2_posttreat_final <- disaster2_posttreat %>% filter(aftermatchtreat == TRUE)
 disaster2_posttreat_final$timing <- 1
-disaster2_matched <- rbind(disaster2_pretreat_final, disaster2_posttreat_final)
+disaster2_matched <- rbind(as.data.frame(disaster2_pretreat_final), as.data.frame(disaster2_posttreat_final))
 disaster2_matched$did <- disaster2_matched$treatcon*disaster2_matched$timing
 disaster2_matched$matchsource <- "d2"
 
-disaster2_did<- lm(lot_bidsCount ~ treatcon + timing + did, data = disaster2_matched, weights = aftermatchweight)
+disaster2_did<- lm(lot_bidsCount ~ treatcon + timing + did + log_contractvalue, data = disaster2_matched, weights = aftermatchweight)
 summary.lm(disaster2_did)
 
 ##Disaster 3 ----
@@ -574,27 +612,9 @@ disaster5_did<- lm(lot_bidsCount ~ treatcon + timing + did, data = disaster5_mat
 summary.lm(disaster5_did)
 
 ##Full matched data
+
 dv1 <- rbind(disaster1_matched, disaster5_matched, disaster4_matched, disaster3_matched, disaster2_matched)
-dv<- arrange(dv1, tender_id)
 
-tenderids <- dv$tender_id
-tenderids <- distinct(as.data.frame(tenderids))
-
-dv<- dv1 %>% group_by(tender_id, lot_bidsCount) %>% mutate(sumwt = sum(aftermatchweight))
-
-dv$aftermatchweight[1]<- dv$aftermatchweight[1] + dv$aftermatchweight[2]
-dv<- dv[-c(2),]
-dv$aftermatchweight[3]<- dv$aftermatchweight[3] + dv$aftermatchweight[6]
-dv<- dv[-c(6),]
-dv$aftermatchweight[4]<- dv$aftermatchweight[4] + dv$aftermatchweight[6]
-dv<- dv[-c(6),]
-dv$aftermatchweight[5]<- dv$aftermatchweight[5] + dv$aftermatchweight[6]
-dv<- dv[-c(6),]
-
-dv$aftermatchweight[4]<- dv$aftermatchweight[5] + dv$aftermatchweight[6] + dv$aftermatchweight[4]
-dv<- dv[-c(5,6),]
-
-dv1_did<- lm(lot_bidsCount ~ treatcon + timing + did + tender_mainCpv + buyer_buyerType , data = dv1, weights = aftermatchweight)
+dv1_did<- lm(lot_bidsCount ~ treatcon + timing + did + log_contractvalue + buyer_buyerType + tender_mainCpv, data = dv1, weights = aftermatchweight)
 summary.lm(dv1_did)
-
-write.xlsx(dv1, "matched.xlsx")
+table(dv1$tender_mainCpv)
