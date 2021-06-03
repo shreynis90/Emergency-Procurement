@@ -113,7 +113,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue","contractyear
 temp1_0<- as.data.frame(temp1_0)
 imbalance(group=temp1_0$treatcon, data=temp1_0[vars2])
 summary(temp1_0$log_contractvalue)
-valuecuts = c(13.024, 13.947, 15.068)
+valuecuts = c(13.051, 13.955, 15.106)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat1_0 <- cem(treatment = "treatcon", data = temp1_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat1_0
@@ -142,7 +142,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue", "meantotalbi
 temp1_1<- as.data.frame(temp1_1)
 imbalance(group=temp1_1$treatcon, data=temp1_1[vars2])
 summary(temp1_1$log_contractvalue)
-valuecuts = c(13.338,14.355, 15.607)
+valuecuts = c(13.174,14.192, 15.293)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat1_1 <- cem(treatment = "treatcon", data = temp1_1, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat1_1
@@ -239,7 +239,7 @@ vars3<- c("log_contractvalue","meantotalbiddersintegrity","contractyear","tender
 temp2_0<- as.data.frame(temp2_0)
 imbalance(group=temp2_0$treatcon, data=temp2_0[vars2])
 summary(temp2_0$log_contractvalue)
-valuecuts = c(13.265,14.295,15.523)
+valuecuts = c(13.121,14.134,15.321)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat2_0 <- cem(treatment = "treatcon", data = temp2_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts),grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat2_0
@@ -270,7 +270,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue", "meantotalbi
 temp2_1<- as.data.frame(temp2_1)
 imbalance(group=temp2_1$treatcon, data=temp2_1[vars2])
 summary(temp2_1$log_contractvalue)
-valuecuts = c(13.46,14.58, 15.97)
+valuecuts = c(13.28,14.25, 15.55)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat2_1 <- cem(treatment = "treatcon", data = temp2_1, drop = "totalbiddersintegrity", grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat2_1
@@ -366,7 +366,7 @@ temp3_0<- as.data.frame(temp3_0)
 imbalance(group=temp3_0$treatcon, data=temp3_0[vars2])
 summary(temp3_0$log_contractvalue)
 
-valuecuts = c(13.294,14.306,15.564)
+valuecuts = c(13.141,14.116,15.340)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat3_0 <- cem(treatment = "treatcon", data = temp3_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat3_0
@@ -394,7 +394,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue", "meantotalbi
 temp3_1<- as.data.frame(temp3_1)
 imbalance(group=temp3_1$treatcon, data=temp3_1[vars2])
 summary(temp3_1$log_contractvalue)
-valuecuts = c(13.44,14.58,15.95)
+valuecuts = c(13.29,14.31,15.61)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat3_1 <- cem(treatment = "treatcon", data = temp3_1, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat3_1
@@ -488,7 +488,7 @@ vars3<- c("log_contractvalue","meantotalbiddersintegrity","contractyear","tender
 temp4_0<- as.data.frame(temp4_0)
 imbalance(group=temp4_0$treatcon, data=temp4_0[vars2])
 summary(temp4_0$log_contractvalue)
-valuecuts = c(13.312,14.361,15.688)
+valuecuts = c(13.192,14.195,15.425)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat4_0 <- cem(treatment = "treatcon", data = temp4_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat4_0
@@ -515,7 +515,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue", "meantotalbi
 temp4_1<- as.data.frame(temp4_1)
 imbalance(group=temp4_1$treatcon, data=temp4_1[vars2])
 summary(temp4_1$log_contractvalue)
-valuecuts = c(13.59,14.82, 16.07)
+valuecuts = c(13.34,14.39, 15.83)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat4_1 <- cem(treatment = "treatcon", data = temp4_1, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat4_1
@@ -609,7 +609,7 @@ vars3<- c("log_contractvalue","meantotalbiddersintegrity","contractyear","tender
 temp5_0<- as.data.frame(temp5_0)
 imbalance(group=temp5_0$treatcon, data=temp5_0[vars2])
 summary(temp5_0$log_contractvalue)
-valuecuts = c(13.34,14.383, 15.697)
+valuecuts = c(13.22,14.211, 15.468)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat5_0 <- cem(treatment = "treatcon", data = temp5_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat5_0
@@ -637,7 +637,7 @@ vars2<- c("buyer_buyerType", "tender_mainCpv", "log_contractvalue","contractyear
 temp5_1<- as.data.frame(temp5_1)
 imbalance(group=temp5_1$treatcon, data=temp5_1[vars2])
 summary(temp5_1$log_contractvalue)
-valuecuts = c(13.60, 14.83, 16.11)
+valuecuts = c(13.33, 14.34, 15.79)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY","OTHER"), c("PUBLIC_BODY"), c("NA",NA))
 mat5_1 <- cem(treatment = "treatcon", data = temp5_1, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat5_1
