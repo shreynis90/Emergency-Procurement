@@ -11,7 +11,7 @@ library(scales)
 library(forcats)
 library(reshape2)
 library(modEvA)
-
+library(mfx)
 library(logistf)
 
 memory.limit(size = 30000)
@@ -474,7 +474,7 @@ summary.lm(model3_ols)
 model3_logit_small<- glm(procedureintegrity ~ treatmentstatus + factor(newcpv) + buyer + log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg3)
 summary.glm(model3_logit_small)
 RsqGLM(model3_logit_small)
-
+logitor(procedureintegrity ~ treatmentstatus + contractmonth + contractyear + log_contractvalue + factor(newcpv) + buyer, data = italy_reg3)
 
 model3_ols_small<- lm(procedureintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue, data = italy_reg3)
 summary.lm(model3_ols_small)

@@ -13,6 +13,7 @@ library(reshape2)
 library(formattable)
 library(gt)
 library(modEvA)
+library(mfx)
 
 memory.limit(size = 30000)
 gc()
@@ -456,8 +457,6 @@ for(i in 1:nrow(italy_reg3)){
 
 italy_reg3$buyer<- ifelse(italy_reg3$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg3$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
 
-write.csv(italy_reg3,"temp3.csv")
-
 model3_logit<- glm(callintegrity ~ treatmentstatus + factor(tender_mainCpv) + buyer_buyerType+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg3)
 summary.glm(model3_logit)
 RsqGLM(model3_logit)
@@ -469,6 +468,7 @@ model3_logit_small<- glm(callintegrity ~ treatmentstatus + factor(newcpv) + buye
 summary.glm(model3_logit_small)
 RsqGLM(model3_logit_small)
 
+logitor(callintegrity ~ treatmentstatus + contractmonth + contractyear + log_contractvalue + factor(newcpv) + buyer, data = italy_reg3)
 
 model3_ols_small<- lm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue, data = italy_reg3)
 summary.lm(model3_ols_small)
@@ -502,8 +502,6 @@ for(i in 1:nrow(italy_reg2)){
 }
 
 italy_reg2$buyer<- ifelse(italy_reg2$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg2$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
-
-write.csv(italy_reg2,"temp2.csv")
 
 model2_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, family ="binomial", data = italy_reg2)
 summary.glm(model2_logit)

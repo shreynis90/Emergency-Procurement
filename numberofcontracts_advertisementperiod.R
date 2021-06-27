@@ -11,6 +11,8 @@ library(scales)
 library(forcats)
 library(reshape2)
 library(modEvA)
+library(mfx)
+
 
 memory.limit(size = 30000)
 gc()
@@ -470,10 +472,15 @@ model3_logit_small<- glm(advertintegrity ~ treatmentstatus + factor(newcpv) + bu
 summary.glm(model3_logit_small)
 RsqGLM(model3_logit_small)
 
+logitor(advertintegrity ~ treatmentstatus + contractmonth + contractyear + log_contractvalue + factor(newcpv) + buyer, data = italy_reg3)
+
+
 model3_ols<- lm(advertintegrity ~ treatmentstatus + contractmonth + contractyear + factor(tender_mainCpv) + log_contractvalue + buyer_buyerType, data = italy_reg3)
 summary.lm(model3_ols)
+
 model3_ols_small<- lm(advertintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue, data = italy_reg3)
 summary.lm(model3_ols_small)
+
 
 ##2 year Regressions ----
 italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
