@@ -13,7 +13,7 @@ library(reshape2)
 library(stargazer)
 library(broom)
 library(modEvA)
-
+library(mfx)
 
 memory.limit(size = 30000)
 gc()
@@ -524,8 +524,7 @@ summary.lm(model1_ols)
 ## USING LOT BIDCOUNTS TO CALCULATE BIDDERS ----
 ## Three year ----
 italy_reg3c<- italy_reg3 %>% filter(!is.na(lot_bidsCount))
-italy_reg3c <- italy_reg3c %>% filter(lot_bidsCount!=0)
-italy_reg3c$totalbiddersIntegrity <- ifelse(italy_reg3c$lot_bidsCount == 1, 1, 0)
+italy_reg3c$totalbiddersIntegrity <- ifelse(italy_reg3c$lot_bidsCount <= 1, 1, 0)
 
 f<- chisq.test(italy_reg3c$treatmentstatus, italy_reg3c$totalbiddersIntegrity, correct = FALSE)
 f
@@ -556,10 +555,13 @@ model3c_logit<- glm(totalbiddersIntegrity ~ treatmentstatus + contractmonth + co
 summary.glm(model3c_logit)
 RsqGLM(model3c_logit)
 
+logitor(totalbiddersIntegrity ~ treatmentstatus + contractmonth + contractyear + log_contractvalue + factor(newcpv) + buyer, data = italy_reg3c)
+
+
 ## Two year ----
 italy_reg2c<- italy_reg2 %>% filter(!is.na(lot_bidsCount))
-italy_reg2c <- italy_reg2c %>% filter(lot_bidsCount!=0)
-italy_reg2c$totalbiddersIntegrity <- ifelse(italy_reg2c$lot_bidsCount == 1, 1, 0)
+
+italy_reg2c$totalbiddersIntegrity <- ifelse(italy_reg2c$lot_bidsCount <= 1, 1, 0)
 
 f<- chisq.test(italy_reg2c$treatmentstatus, italy_reg2c$totalbiddersIntegrity, correct = FALSE)
 f
@@ -586,14 +588,14 @@ for(i in 1:nrow(italy_reg2c)){
 italy_reg2c$buyer<- ifelse(italy_reg2c$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg2c$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
 
 
-model2c_logit<- glm(totalbiddersIntegrity ~ treatmentstatus + contractmonth + contractyear + log_contractvalue + factor(newcpv) + buyer_buyerType, family ="binomial", data = italy_reg2c)
+model2c_logit<- glm(totalbiddersIntegrity ~ treatmentstatus + contractmonth + contractyear + log_contractvalue + factor(newcpv) + buyer, family ="binomial", data = italy_reg2c)
 summary.glm(model2c_logit)
 RsqGLM(model2c_logit)
 
 ##One Year ----
 italy_reg1c<- italy_reg1 %>% filter(!is.na(lot_bidsCount))
-italy_reg1c <- italy_reg1c %>% filter(lot_bidsCount!=0)
-italy_reg1c$totalbiddersIntegrity <- ifelse(italy_reg1c$lot_bidsCount == 1, 1, 0)
+
+italy_reg1c$totalbiddersIntegrity <- ifelse(italy_reg1c$lot_bidsCount <= 1, 1, 0)
 
 f<- chisq.test(italy_reg1c$treatmentstatus, italy_reg1c$totalbiddersIntegrity, correct = FALSE)
 f
