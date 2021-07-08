@@ -118,7 +118,7 @@ disaster1_pretreat$timing <- 0
 disaster1 <- rbind(as.data.frame(disaster1_pretreat), as.data.frame(disaster1_posttreat))
 
 #Matching
-vars <- c("timing", "tender_mainCpv", "procedureintegrity", "log_contractvalue", "meanprocedureintegrity","contractmonth")
+vars <- c("timing", "tender_mainCpv", "procedureintegrity", "log_contractvalue", "meanprocedureintegrity","contractmonth","buyer_buyerType")
 temp1_0<-disaster1[vars]
 vars2<- c("log_contractvalue","meanprocedureintegrity")
 temp1_0<- as.data.frame(temp1_0)

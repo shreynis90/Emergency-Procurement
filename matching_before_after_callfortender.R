@@ -9,6 +9,7 @@ library(lubridate)
 library(compare)
 library(stringi)
 library(modEvA)
+library(mfx)
 memory.limit(size = 30000)
 gc()
 italy<- read_excel("data_09_20.xlsx")
@@ -118,7 +119,7 @@ disaster1_pretreat$timing <- 0
 disaster1 <- rbind(as.data.frame(disaster1_pretreat), as.data.frame(disaster1_posttreat))
 
 #Matching
-vars <- c("timing", "tender_mainCpv", "callintegrity", "log_contractvalue", "meancallintegrity","contractmonth")
+vars <- c("timing", "tender_mainCpv", "callintegrity", "log_contractvalue", "meancallintegrity","contractmonth", "buyer_buyerType")
 temp1_0<-disaster1[vars]
 vars2<- c("log_contractvalue","meancallintegrity")
 temp1_0<- as.data.frame(temp1_0)
@@ -546,3 +547,4 @@ dv1_did<- glm(callintegrity ~ timing, data = dv1, family="binomial", weights = a
 summary.glm(dv1_did)
 table(dv1$timing)
 RsqGLM(dv1_did)
+
