@@ -48,7 +48,7 @@ italy_disaster1<- italy %>%
 italy_disaster1 <- data.frame(italy_disaster1)
 italy_disaster1$buyer_buyerType <- as.factor(italy_disaster1$buyer_buyerType) #Declaring buyer_buyerType as a factor
 italy_disaster1$tender_mainCpv <- as.integer(italy_disaster1$tender_mainCpv)
-italy_disaster1$tender_mainCpv <- sub("^(\\d{3}).*$", "\\1", italy_disaster1$tender_mainCpv) #Retaining only the first two digits of the the CPV code
+italy_disaster1$tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_disaster1$tender_mainCpv) #Retaining only the first two digits of the the CPV code
 italy_disaster1$tender_mainCpv <- as.integer(italy_disaster1$tender_mainCpv)
 italy_disaster1$tender_mainCpv
 
@@ -119,14 +119,15 @@ disaster1_pretreat$timing <- 0
 disaster1 <- rbind(as.data.frame(disaster1_pretreat), as.data.frame(disaster1_posttreat))
 
 #Matching
-vars <- c("timing", "tender_mainCpv", "totalbiddersintegrity", "log_contractvalue", "meantotalbiddersintegrity","contractmonth", "buyer_buyerType")
+vars <- c("timing", "tender_mainCpv", "totalbiddersintegrity", "log_contractvalue", "meantotalbiddersintegrity","contractmonth","buyer_buyerType")
 temp1_0<-disaster1[vars]
 vars2<- c("log_contractvalue","meantotalbiddersintegrity")
 temp1_0<- as.data.frame(temp1_0)
 imbalance(group=temp1_0$timing, data=temp1_0[vars2])
 summary(temp1_0$log_contractvalue)
-valuecuts1_0 = c(13.06)
-mat1_0 <- cem(treatment = "timing", data = temp1_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts1_0))
+buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY","OTHER","PUBLIC_BODY","NA",NA))
+valuecuts1_0 = c(12.13, 13.06 ,14.22)
+mat1_0 <- cem(treatment = "timing", data = temp1_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts1_0), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat1_0
 mat1_0$w
 est1_0 <- att(mat1_0, totalbiddersintegrity ~ timing, data = temp1_0)
@@ -143,7 +144,7 @@ italy_disaster2<- italy %>%
 italy_disaster2 <- data.frame(italy_disaster2)
 italy_disaster2$buyer_buyerType <- as.factor(italy_disaster2$buyer_buyerType) #Declaring buyer_buyerType as a factor
 italy_disaster2$tender_mainCpv <- as.integer(italy_disaster2$tender_mainCpv)
-italy_disaster2$tender_mainCpv <- sub("^(\\d{3}).*$", "\\1", italy_disaster2$tender_mainCpv) #Retaining only the first three digits of the the CPV code
+italy_disaster2$tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_disaster2$tender_mainCpv) #Retaining only the first three digits of the the CPV code
 italy_disaster2$tender_mainCpv <- as.integer(italy_disaster2$tender_mainCpv)
 italy_disaster2$tender_mainCpv
 
@@ -227,9 +228,8 @@ vars3<- c("log_contractvalue","meantotalbiddersintegrity","contractyear","tender
 temp2_0<- as.data.frame(temp2_0)
 imbalance(group=temp2_0$timing, data=temp2_0[vars2])
 summary(temp2_0$log_contractvalue)
-valuecuts2_0 = c(14.16)
-buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
-mat2_0 <- cem(treatment = "timing", data = temp2_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts2_0))
+valuecuts2_0 = c(13.18,14.16,15.46)
+mat2_0 <- cem(treatment = "timing", data = temp2_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts2_0), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat2_0
 est2_0 <- att(mat2_0, totalbiddersintegrity ~ timing, data = temp2_0)
 est2_0
@@ -245,7 +245,7 @@ italy_disaster3<- italy %>%
 italy_disaster3 <- data.frame(italy_disaster3)
 italy_disaster3$buyer_buyerType <- as.factor(italy_disaster3$buyer_buyerType) #Declaring buyer_buyerType as a factor
 italy_disaster3$tender_mainCpv <- as.integer(italy_disaster3$tender_mainCpv)
-italy_disaster3$tender_mainCpv <- sub("^(\\d{3}).*$", "\\1", italy_disaster3$tender_mainCpv) #Retaining only the first three digits of the the CPV code
+italy_disaster3$tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_disaster3$tender_mainCpv) #Retaining only the first three digits of the the CPV code
 italy_disaster3$tender_mainCpv <- as.integer(italy_disaster3$tender_mainCpv)
 italy_disaster3$tender_mainCpv
 
@@ -328,8 +328,8 @@ vars2<- c("timing", "log_contractvalue", "meantotalbiddersintegrity")
 temp3_0<- as.data.frame(temp3_0)
 imbalance(group=temp3_0$timing, data=temp3_0[vars2])
 summary(temp3_0$log_contractvalue)
-valuecuts3_0 <- c(13.97)
-mat3_0 <- cem(treatment = "timing", data = temp3_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts3_0))
+valuecuts3_0 <- c(13.10,13.97,14.79)
+mat3_0 <- cem(treatment = "timing", data = temp3_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts3_0), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat3_0
 est3_0 <- att(mat3_0, totalbiddersintegrity ~ timing, data = temp3_0)
 est3_0
@@ -346,7 +346,7 @@ italy_disaster4<- italy %>%
 italy_disaster4 <- data.frame(italy_disaster4)
 italy_disaster4$buyer_buyerType <- as.factor(italy_disaster4$buyer_buyerType) #Declaring buyer_buyerType as a factor
 italy_disaster4$tender_mainCpv <- as.integer(italy_disaster4$tender_mainCpv)
-italy_disaster4$tender_mainCpv <- sub("^(\\d{3}).*$", "\\1", italy_disaster4$tender_mainCpv) #Retaining only the first three digits of the the CPV code
+italy_disaster4$tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_disaster4$tender_mainCpv) #Retaining only the first three digits of the the CPV code
 italy_disaster4$tender_mainCpv <- as.integer(italy_disaster4$tender_mainCpv)
 italy_disaster4$tender_mainCpv
 
@@ -428,9 +428,8 @@ vars3<- c("log_contractvalue","meantotalbiddersintegrity","contractyear","tender
 temp4_0<- as.data.frame(temp4_0)
 imbalance(group=temp4_0$timing, data=temp4_0[vars2])
 summary(temp4_0$log_contractvalue)
-valuecuts4_0 = c(13.60)
-buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
-mat4_0 <- cem(treatment = "timing", data = temp4_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts4_0))
+valuecuts4_0 = c(12.81,13.60,14.12)
+mat4_0 <- cem(treatment = "timing", data = temp4_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts4_0), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat4_0
 est4_0 <- att(mat4_0, totalbiddersintegrity ~ timing, data = temp4_0)
 est4_0
@@ -447,7 +446,7 @@ italy_disaster5<- italy %>%
 italy_disaster5 <- data.frame(italy_disaster5)
 italy_disaster5$buyer_buyerType <- as.factor(italy_disaster5$buyer_buyerType) #Declaring buyer_buyerType as a factor
 italy_disaster5$tender_mainCpv <- as.integer(italy_disaster5$tender_mainCpv)
-italy_disaster5$tender_mainCpv <- sub("^(\\d{3}).*$", "\\1", italy_disaster5$tender_mainCpv) #Retaining only the first three digits of the the CPV code
+italy_disaster5$tender_mainCpv <- sub("^(\\d{2}).*$", "\\1", italy_disaster5$tender_mainCpv) #Retaining only the first three digits of the the CPV code
 italy_disaster5$tender_mainCpv <- as.integer(italy_disaster5$tender_mainCpv)
 italy_disaster5$tender_mainCpv
 
@@ -528,9 +527,8 @@ vars2<- c("tender_mainCpv", "log_contractvalue", "meantotalbiddersintegrity")
 temp5_0<- as.data.frame(temp5_0)
 imbalance(group=temp5_0$timing, data=temp5_0[vars2])
 summary(temp5_0$log_contractvalue)
-valuecuts5_0 = c(14.16)
-buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
-mat5_0 <- cem(treatment = "timing", data = temp5_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts5_0))
+valuecuts5_0 = c(13.24,14.16,14.92)
+mat5_0 <- cem(treatment = "timing", data = temp5_0, drop = "totalbiddersintegrity",cutpoints = list(log_contractvalue=valuecuts5_0), grouping = list(buyer_buyerType= buyer_buyerType.grp))
 mat5_0
 est5_0 <- att(mat5_0, totalbiddersintegrity ~ timing, data = temp5_0)
 est5_0
