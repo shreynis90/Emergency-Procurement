@@ -126,7 +126,7 @@ temp1_0<- as.data.frame(temp1_0)
 imbalance(group=temp1_0$timing, data=temp1_0[vars2])
 summary(temp1_0$log_contractvalue)
 valuecuts1_0 = c(13.05)
-mat1_0 <- cem(treatment = "timing", data = temp1_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts1_0))
+mat1_0 <- cem(treatment = "timing", data = temp1_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts1_0), eval.imbalance = TRUE)
 mat1_0
 mat1_0$w
 est1_0 <- att(mat1_0, advertintegrity ~ timing, data = temp1_0)
@@ -229,7 +229,7 @@ imbalance(group=temp2_0$timing, data=temp2_0[vars2])
 summary(temp2_0$log_contractvalue)
 valuecuts2_0 = c(14.34)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
-mat2_0 <- cem(treatment = "timing", data = temp2_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts2_0))
+mat2_0 <- cem(treatment = "timing", data = temp2_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts2_0), eval.imbalance = TRUE)
 mat2_0
 est2_0 <- att(mat2_0, advertintegrity ~ timing, data = temp2_0)
 est2_0
@@ -329,7 +329,7 @@ temp3_0<- as.data.frame(temp3_0)
 imbalance(group=temp3_0$timing, data=temp3_0[vars2])
 summary(temp3_0$log_contractvalue)
 valuecuts3_0 <- c(14.23)
-mat3_0 <- cem(treatment = "timing", data = temp3_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts3_0))
+mat3_0 <- cem(treatment = "timing", data = temp3_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts3_0), eval.imbalance = TRUE)
 mat3_0
 est3_0 <- att(mat3_0, advertintegrity ~ timing, data = temp3_0)
 est3_0
@@ -431,7 +431,7 @@ imbalance(group=temp4_0$timing, data=temp4_0[vars2])
 summary(temp4_0$log_contractvalue)
 valuecuts4_0 = c(13.76)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
-mat4_0 <- cem(treatment = "timing", data = temp4_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts4_0))
+mat4_0 <- cem(treatment = "timing", data = temp4_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts4_0), eval.imbalance = TRUE)
 mat4_0
 est4_0 <- att(mat4_0, advertintegrity ~ timing, data = temp4_0)
 est4_0
@@ -531,7 +531,7 @@ imbalance(group=temp5_0$timing, data=temp5_0[vars2])
 summary(temp5_0$log_contractvalue)
 valuecuts5_0 = c(14.95)
 buyer_buyerType.grp<- list(c("REGIONAL_AUTHORITY", "REGIONAL_AGENCY", "UTILITIES"), c("NATIONAL_AUTHORITY"),c("OTHER"), c("PUBLIC_BODY"), c("NA",NA))
-mat5_0 <- cem(treatment = "timing", data = temp5_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts5_0))
+mat5_0 <- cem(treatment = "timing", data = temp5_0, drop = "advertintegrity",cutpoints = list(log_contractvalue=valuecuts5_0), eval.imbalance = TRUE)
 mat5_0
 est5_0 <- att(mat5_0, advertintegrity ~ timing, data = temp5_0)
 est5_0
@@ -543,7 +543,9 @@ disaster5_final <- disaster5 %>% filter(aftermatchtreat == TRUE)
 
 dv1 <- rbind(disaster1_final, disaster2_final, disaster3_final, disaster4_final, disaster5_final)
 
-dv1_did<- glm(advertintegrity ~ timing, data = dv1, family="binomial", weights = aftermatchweight)
-summary.glm(dv1_did)
-table(dv1$timing)
-RsqGLM(dv1_did)
+dv1_pre <- dv1 %>% filter(timing == 0)
+dv1_post <- dv1 %>% filter(timing == 1)
+
+
+matched_comparison<- t.test(dv1_pre$advertintegrity,dv1_post$advertintegrity, paired = FALSE, conf.level = 0.90)
+matched_comparison
