@@ -14,6 +14,7 @@ library(stargazer)
 library(broom)
 library(modEvA)
 library(mfx)
+library(margins)
 
 memory.limit(size = 30000)
 gc()
@@ -71,7 +72,7 @@ italy_disaster1 <- subset(italy_disaster1, !(is.na(tender_publications_firstCall
 italy_disaster1$Date <- as.yearmon(paste(italy_disaster1$contractmonth, italy_disaster1$contractyear), "%m %Y")
 
 ##Number of Treated contracts by single bid integrity variable
-ncontracts1 <- italy_disaster1 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
+ncontracts1 <- italy_disaster1 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
 
 ncontracts1
 
@@ -97,7 +98,7 @@ disaster2_date <- as.POSIXct("2012-05-29")
 
 ###Number of Contracts ----
 italy_disaster2$Date <- as.yearmon(paste(italy_disaster2$contractmonth, italy_disaster2$contractyear), "%m %Y")
-ncontracts2 <- italy_disaster2 %>% filter(treatcon == 1) %>% group_by(Date, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
+ncontracts2 <- italy_disaster2 %>% filter(treatcon == 1) %>% group_by(Date, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
 
 ##Disaster 3 ----
 #Removing contracts from other disaster areas#
@@ -122,7 +123,7 @@ disaster3_date <- as.POSIXct("2013-11-18")
 
 ###Number of Contracts ----
 italy_disaster3$Date <- as.yearmon(paste(italy_disaster3$contractmonth, italy_disaster3$contractyear), "%m %Y")
-ncontracts3 <- italy_disaster3 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
+ncontracts3 <- italy_disaster3 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
 
 
 ##Disaster 4 ----
@@ -148,7 +149,7 @@ disaster4_date <- as.POSIXct("2016-08-24")
 
 ###Number of Contracts ----
 italy_disaster4$Date <- as.yearmon(paste(italy_disaster4$contractmonth, italy_disaster4$contractyear), "%m %Y")
-ncontracts4 <- italy_disaster4 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
+ncontracts4 <- italy_disaster4 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
 
 
 ##Disaster 5----
@@ -174,7 +175,7 @@ disaster5_date <- as.POSIXct("2017-01-18")
 
 ###Number of Contracts
 italy_disaster5$Date <- as.yearmon(paste(italy_disaster5$contractmonth, italy_disaster5$contractyear), "%m %Y")
-ncontracts5 <- italy_disaster5 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
+ncontracts5 <- italy_disaster5 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, singlebidintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, singlebidintegrity) %>% distinct()
 
 
 ##Declaring new variables for time and order
@@ -276,7 +277,7 @@ ncontracts5
 
 ncontracts<- rbind(ncontracts1, ncontracts2, ncontracts3, ncontracts4, ncontracts5)
 
-ncontracts <- ncontracts %>% group_by(time, singlebidintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(time, numberofcontracts, treatcon, ord, singlebidintegrity) %>% distinct()
+ncontracts <- ncontracts %>% group_by(time, singlebidintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% dplyr::select(time, numberofcontracts, treatcon, ord, singlebidintegrity) %>% distinct()
 ncontracts<- as.data.frame(ncontracts)
 ncontracts$ord<- as.numeric(as.character(ncontracts$ord))
 ncontracts <- ncontracts%>% filter(ord >= -12 & ord<= 12)
@@ -298,7 +299,7 @@ ncontracts<- as.data.frame(ncontracts)
 ncontracts$ord<- as.numeric(as.character(ncontracts$ord))
 ncontracts$numberofcontracts<- as.numeric(ncontracts$numberofcontracts)
 
-ncontracts <- ncontracts %>% group_by(time, singlebidintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% select(singlebidintegrity,time, numberofcontracts, treatcon, ord) %>% distinct()
+ncontracts <- ncontracts %>% group_by(time, singlebidintegrity)%>% mutate(numberofcontracts = sum(numberofcontracts)) %>% dplyr::select(singlebidintegrity,time, numberofcontracts, treatcon, ord) %>% distinct()
 
 ncontracts <- ncontracts%>% filter(ord >= -36 & ord<= 36)
 
@@ -357,9 +358,9 @@ for (i in tr:1) {
   }
 }
 
-ncontracts <- ncontracts %>% group_by(date, singlebidintegrity)%>% mutate(numberofcontracts = round(sum(numberofcontracts),2)) %>% select(singlebidintegrity,date, numberofcontracts, treatcon) %>% distinct()
+ncontracts <- ncontracts %>% group_by(date, singlebidintegrity)%>% mutate(numberofcontracts = round(sum(numberofcontracts),2)) %>% dplyr::select(singlebidintegrity,date, numberofcontracts, treatcon) %>% distinct()
 
-ncontracts <- ncontracts %>% group_by(date)%>% mutate(share = round(numberofcontracts/sum(numberofcontracts),2)) %>% select(singlebidintegrity,date, numberofcontracts, treatcon, share) %>% distinct()
+ncontracts <- ncontracts %>% group_by(date)%>% mutate(share = round(numberofcontracts/sum(numberofcontracts),2)) %>% dplyr::select(singlebidintegrity,date, numberofcontracts, treatcon, share) %>% distinct()
 
 ggplot(data=ncontracts, aes(x=fct_inorder(date), y=numberofcontracts, fill=as.factor(singlebidintegrity))) + geom_bar(stat="identity")+  scale_fill_brewer(palette="Dark2")+
   theme_minimal()+   theme(axis.text.x=element_text(angle=90,hjust=1)) +  geom_vline(xintercept=ncontracts$ord[25] ,linetype=1, colour="black")+ labs(title="Quarterly Number of Contracts By Single Bidder Integrity", x="Dates (unit in Quarters)", y = "Quarterly Number of Contracts" , subtitle="Disaster Month depicts the share of contracts in the Disaster Month", fill = "1: Single Bidder")
@@ -557,6 +558,7 @@ RsqGLM(model3c_logit)
 
 logitor(totalbiddersIntegrity ~ treatmentstatus + contractmonth + contractyear + log_contractvalue + factor(newcpv) + buyer, data = italy_reg3c)
 
+summary(margins(model3c_logit))
 
 ## Two year ----
 italy_reg2c<- italy_reg2 %>% filter(!is.na(lot_bidsCount))
