@@ -168,7 +168,7 @@ italy_disaster1_out$contractdate_final <- as.POSIXct(italy_disaster1_out$contrac
 italy_disaster1_out$contractvalue <- ifelse(is.na(italy_disaster1_out$tender_finalPrice_EUR), ifelse(is.na(italy_disaster1_out$tender_estimatedPrice_EUR),"",italy_disaster1_out$tender_estimatedPrice_EUR),italy_disaster1_out$tender_finalPrice_EUR)
 italy_disaster1_out$log_contractvalue <- log(as.numeric(as.character(italy_disaster1_out$contractvalue)))
 
-italy_disaster2 <- italy_disaster2 %>% filter(contractyear == 2009|contractyear == 2010)
+#italy_disaster2 <- italy_disaster2 %>% filter(contractyear == 2009|contractyear == 2010)
 
 ##
 disaster1_date <- as.POSIXct("2009-10-02")
@@ -228,7 +228,7 @@ vars <- c("ID","loc", "tender_mainCpv", "advertintegrity", "log_contractvalue","
 temp1_0_did<-disaster1_in_out_pretreat[vars]
 vars2<- c("loc", "tender_mainCpv", "log_contractvalue","contractmonth","buyer_buyerType","meanadvertintegrity")
 temp1_0_did<- as.data.frame(temp1_0_did)
-imbalance(group=temp1_0_did$loc, data=temp1_0_did[vars2])
+#imbalance(group=temp1_0_did$loc, data=temp1_0_did[vars2])
 summary(temp1_0_did$log_contractvalue)
 summary(temp1_0_did$meanadvertintegrity)
 valuecuts1_0_did = c(15,14)
@@ -248,7 +248,7 @@ disaster1_in_out_posttreat <- rbind(disaster1_out_posttreat, disaster1_in_posttr
 
 temp1_1_did<-disaster1_in_out_posttreat[vars]
 temp1_1_did<- as.data.frame(temp1_1_did)
-imbalance(group=temp1_1_did$loc, data=temp1_1_did[vars2])
+#imbalance(group=temp1_1_did$loc, data=temp1_1_did[vars2])
 summary(temp1_1_did$log_contractvalue)
 summary(temp1_1_did$meanadvertintegrity)
 valuecuts1_1_did = c(13.319,14.331)
@@ -354,7 +354,7 @@ disaster2 <- rbind(as.data.frame(disaster2_pretreat), as.data.frame(disaster2_po
 
 temp2_0<-disaster2[vars_bf]
 temp2_0<- as.data.frame(temp2_0)
-imbalance(group=temp2_0$timing, data=temp2_0[vars2_bf])
+#imbalance(group=temp2_0$timing, data=temp2_0[vars2_bf])
 summary(temp2_0$log_contractvalue)
 valuecuts2_0 = c(13.18,14.34,15.62,14)
 mat2_0 <- cem(treatment = "timing", data = temp2_0, drop = c("ID","advertintegrity"), eval.imbalance = TRUE)
@@ -473,7 +473,7 @@ disaster2_in_out_posttreat <- rbind(disaster2_out_posttreat, disaster2_in_posttr
 
 temp2_1_did<-disaster2_in_out_posttreat[vars]
 temp2_1_did<- as.data.frame(temp2_1_did)
-imbalance(group=temp2_1_did$loc, data=temp2_1_did[vars2])
+#imbalance(group=temp2_1_did$loc, data=temp2_1_did[vars2])
 summary(temp2_1_did$log_contractvalue)
 valuecuts2_1_did = c(13.46,14.58)
 mat2_1_did <- cem(treatment = "loc", data = temp2_1_did, drop = c("ID","advertintegrity"),cutpoints = list(log_contractvalue=valuecuts2_1_did), eval.imbalance = TRUE)
@@ -1168,13 +1168,13 @@ disaster3_did_final$contractday <- as.numeric(disaster3_did_final$contractday)
 dv2 <- rbind(disaster1_did_final, disaster2_did_final, disaster3_did_final, disaster4_did_final, disaster5_did_final)
 
 dv3<- transform(dv2, freq.loc = ave(seq(nrow(dv2)), buyer_name, FUN=length))
-dv4<- dv3 %>% filter(freq.loc>150)
+dv4<- dv3 %>% filter(freq.loc>600)
 dv4_in<- dv4 %>% filter(loc==1)
 dv4_out <- dv4 %>% filter(loc==0)
 
 dv4_out_sumwt <- dv4_out %>% group_by(ID) %>% mutate(sumwt = sum(aftermatchweight))
 dv4_out_sumwt2<- distinct(dv4_out_sumwt)
-didreg = lm(advertintegrity ~ loc*timing +  contractyear + contractmonth + buyer_buyerType + tender_mainCpv, data = dv4, weights = aftermatchweight)
+didreg = lm(advertintegrity ~ loc*timing +  contractyear + contractmonth + buyer_buyerType + tender_mainCpv + log_contractvalue, data = dv4, weights = aftermatchweight)
 summary(didreg)
 
 dv4_pre_in <- dv4 %>% filter(timing == 0 & loc == 1)
