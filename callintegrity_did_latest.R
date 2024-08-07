@@ -1261,3 +1261,21 @@ p <- ggplot(df, aes(year, as.numeric(as.character(meancallintegrity)))) +       
            vjust = 26) + ylab("Non-publication of tender calls")
 p#+ geom_errorbar( aes(ymin = as.numeric(as.character(lowerbound)), ymax = as.numeric(as.character(upperbound))), width = 0.1, size = 1, color = 'blue')
 
+
+library(multiwayvcov)
+library(lmtest)
+
+cluster_var <- "buyer_nuts"
+
+didreg2 = lm(callintegrity ~ loc*timing +  contractyear + contractmonth + buyer_buyerType + tender_mainCpv + log_contractvalue, data = dv4, weights = aftermatchweight)
+
+summary(didreg2)
+
+
+clustered_se <- cluster.vcov(didreg2, dv4[[cluster_var]])
+
+summary_coeftest <- coeftest(didreg2, clustered_se)
+print(summary_coeftest)
+
+distinct_rows <- dv4 %>% distinct(buyer_nuts)
+print(distinct_rows)
