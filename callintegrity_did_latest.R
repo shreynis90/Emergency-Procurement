@@ -73,7 +73,6 @@ disaster1_date <- as.POSIXct("2009-10-02")
 
 ##Dropping those that did not have firstcalldate or tenderbiddeadline before 2011
 italy_disaster1 <- subset(italy_disaster1, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011)) 
-italy_disaster1 <- italy_disaster1 %>% filter(contractyear == 2009| contractyear == 2010| contractyear == 2011|contractyear == 2012)
 
 
 italy_disaster1 <- italy_disaster1 %>% #Dropping the Contracts that are missing the dependent variable 
@@ -134,7 +133,7 @@ vars_bf <- c("ID","timing", "tender_mainCpv", "callintegrity", "log_contractvalu
 temp1_0<-disaster1[vars_bf]
 vars2_bf<- c("timing", "tender_mainCpv", "log_contractvalue", "meancallintegrity","contractmonth","buyer_buyerType")
 temp1_0<- as.data.frame(temp1_0)
-imbalance(group=temp1_0$timing, data=temp1_0[vars_bf])
+#imbalance(group=temp1_0$timing, data=temp1_0[vars_bf])
 summary(temp1_0$log_contractvalue)
 valuecuts1_0 = c(10.93,14,15)
 mat1_0 <- cem(treatment = "timing", data = temp1_0, drop = c("ID","callintegrity"),cutpoints = list(log_contractvalue=valuecuts1_0), eval.imbalance = TRUE)
@@ -228,7 +227,7 @@ vars <- c("ID","loc", "tender_mainCpv", "callintegrity", "log_contractvalue","bu
 temp1_0_did<-disaster1_in_out_pretreat[vars]
 vars2<- c("loc", "tender_mainCpv", "log_contractvalue","contractmonth","buyer_buyerType","meancallintegrity")
 temp1_0_did<- as.data.frame(temp1_0_did)
-imbalance(group=temp1_0_did$loc, data=temp1_0_did[vars2])
+#imbalance(group=temp1_0_did$loc, data=temp1_0_did[vars2])
 summary(temp1_0_did$log_contractvalue)
 summary(temp1_0_did$meancallintegrity)
 valuecuts1_0_did = c(15,14)
@@ -248,7 +247,7 @@ disaster1_in_out_posttreat <- rbind(disaster1_out_posttreat, disaster1_in_posttr
 
 temp1_1_did<-disaster1_in_out_posttreat[vars]
 temp1_1_did<- as.data.frame(temp1_1_did)
-imbalance(group=temp1_1_did$loc, data=temp1_1_did[vars2])
+#imbalance(group=temp1_1_did$loc, data=temp1_1_did[vars2])
 summary(temp1_1_did$log_contractvalue)
 summary(temp1_1_did$meancallintegrity)
 valuecuts1_1_did = c(13.319,14.331)
@@ -291,8 +290,6 @@ disaster2_date <- as.POSIXct("2012-05-29")
 
 ##Dropping those that did not have firstcalldate or tenderbiddeadline before 2011
 italy_disaster2 <- subset(italy_disaster2, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011)) 
-italy_disaster2 <- italy_disaster2 %>% filter(contractyear == 2009| contractyear == 2010| contractyear == 2011|contractyear == 2012| contractyear == 2013| contractyear == 2014| contractyear == 2015)
-
 
 ##Pretreatment average of the dependent variable
 italy_disaster2 <- italy_disaster2 %>% #Dropping the Contracts that are missing the callintegrity
@@ -354,7 +351,7 @@ disaster2 <- rbind(as.data.frame(disaster2_pretreat), as.data.frame(disaster2_po
 
 temp2_0<-disaster2[vars_bf]
 temp2_0<- as.data.frame(temp2_0)
-imbalance(group=temp2_0$timing, data=temp2_0[vars2_bf])
+#imbalance(group=temp2_0$timing, data=temp2_0[vars2_bf])
 summary(temp2_0$log_contractvalue)
 valuecuts2_0 = c(13.18,14.34,15.62,14)
 mat2_0 <- cem(treatment = "timing", data = temp2_0, drop = c("ID","callintegrity"), eval.imbalance = TRUE)
@@ -473,7 +470,7 @@ disaster2_in_out_posttreat <- rbind(disaster2_out_posttreat, disaster2_in_posttr
 
 temp2_1_did<-disaster2_in_out_posttreat[vars]
 temp2_1_did<- as.data.frame(temp2_1_did)
-imbalance(group=temp2_1_did$loc, data=temp2_1_did[vars2])
+#imbalance(group=temp2_1_did$loc, data=temp2_1_did[vars2])
 summary(temp2_1_did$log_contractvalue)
 valuecuts2_1_did = c(13.46,14.58)
 mat2_1_did <- cem(treatment = "loc", data = temp2_1_did, drop = c("ID","callintegrity"),cutpoints = list(log_contractvalue=valuecuts2_1_did), eval.imbalance = TRUE)
@@ -514,7 +511,7 @@ disaster3_date <- as.POSIXct("2013-11-18")
 
 ##Dropping those that did not have firstcalldate or tenderbiddeadline before 2011
 italy_disaster3 <- subset(italy_disaster3, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011)) 
-italy_disaster3 <- italy_disaster3 %>% filter(contractyear == 2010| contractyear == 2011| contractyear == 2012|contractyear == 2013| contractyear == 2014| contractyear == 2015| contractyear == 2016)
+
 
 ##Pretreatment average of the dependent variable
 italy_disaster3 <- italy_disaster3 %>% #Dropping the Contracts that are missing the number of bidders 
@@ -729,7 +726,7 @@ disaster4_date <- as.POSIXct("2016-08-24")
 
 ##Dropping those that did not have firstcalldate or tenderbiddeadline before 2011
 italy_disaster4 <- subset(italy_disaster4, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011)) 
-italy_disaster4 <- italy_disaster4 %>% filter(contractyear == 2013| contractyear == 2014| contractyear == 2015|contractyear == 2016| contractyear == 2017| contractyear == 2018| contractyear == 2019)
+
 
 ##Pretreatment average of the dependent variable
 italy_disaster4 <- italy_disaster4 %>% #Dropping the Contracts that are missing the number of bidders 
@@ -893,7 +890,7 @@ disaster4_did_0 <- disaster4_in_out_pretreat %>% filter(aftermatchtreat == TRUE)
 dis4_mean_in <- disaster4_did_0 %>% filter(loc == 1)
 dis4_mean_out <- disaster4_did_0 %>% filter(loc == 0)
 
-t.test(dis4_mean_in$callintegrity,dis4_mean_out$callintegrity, paired = FALSE, conf.level = 0.90)
+#t.test(dis4_mean_in$callintegrity,dis4_mean_out$callintegrity, paired = FALSE, conf.level = 0.90)
 
 ##Disaster 4_Postreatment ----
 
@@ -947,7 +944,6 @@ disaster5_date <- as.POSIXct("2017-01-18")
 
 ##Dropping those that did not have firstcalldate or tenderbiddeadline before 2011
 italy_disaster5 <- subset(italy_disaster5, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011)) 
-italy_disaster5 <- italy_disaster5 %>% filter(contractyear == 2014| contractyear == 2015| contractyear == 2016|contractyear == 2017| contractyear == 2018| contractyear == 2019| contractyear == 2020)
 
 
 ##Pretreatment average of the dependent variable
@@ -1164,13 +1160,13 @@ disaster3_did_final$contractday <- as.numeric(disaster3_did_final$contractday)
 dv2 <- rbind(disaster1_did_final, disaster2_did_final, disaster3_did_final, disaster4_did_final, disaster5_did_final)
 
 dv3<- transform(dv2, freq.loc = ave(seq(nrow(dv2)), buyer_name, FUN=length))
-dv4<- dv3 %>% filter(freq.loc>150)
+dv4<- dv3
 dv4_in<- dv4 %>% filter(loc==1)
 dv4_out <- dv4 %>% filter(loc==0)
 
 dv4_out_sumwt <- dv4_out %>% group_by(ID) %>% mutate(sumwt = sum(aftermatchweight))
 dv4_out_sumwt2<- distinct(dv4_out_sumwt)
-didreg = lm(callintegrity ~ loc*timing +  contractyear + contractmonth + buyer_buyerType + tender_mainCpv, data = dv4, weights = aftermatchweight)
+didreg = lm(callintegrity ~ loc*timing +  contractyear + contractmonth + buyer_buyerType + tender_mainCpv + log_contractvalue, data = dv4, weights = aftermatchweight)
 summary(didreg)
 
 dv4_pre_in <- dv4 %>% filter(timing == 0 & loc == 1)
@@ -1264,5 +1260,4 @@ p <- ggplot(df, aes(year, as.numeric(as.character(meancallintegrity)))) +       
            angle = 90, 
            vjust = 26) + ylab("Non-publication of tender calls")
 p#+ geom_errorbar( aes(ymin = as.numeric(as.character(lowerbound)), ymax = as.numeric(as.character(upperbound))), width = 0.1, size = 1, color = 'blue')
-
 
