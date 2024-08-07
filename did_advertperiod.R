@@ -1279,11 +1279,14 @@ didreg2 = lm(advertintegrity ~ loc*timing +  contractyear + contractmonth + buye
 
 summary(didreg2)
 
+saveRDS(didreg2, '3_advertperiod_did.Rds')
 
 clustered_se <- cluster.vcov(didreg2, dv4[[cluster_var]])
 
 summary_coeftest <- coeftest(didreg2, clustered_se)
 print(summary_coeftest)
+
+saveRDS(summary_coeftest, '3_advertperiod_did_clustered_se.Rds')
 
 distinct_rows <- dv4 %>% distinct(buyer_nuts)
 print(distinct_rows)

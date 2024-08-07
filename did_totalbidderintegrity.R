@@ -1262,11 +1262,14 @@ didreg2 = lm(totalbiddersintegrity ~ loc*timing +  contractyear + contractmonth 
 
 summary(didreg2)
 
+saveRDS(didreg2, '4_totalbidderintegrity_did.Rds')
 
 clustered_se <- cluster.vcov(didreg2, dv4[[cluster_var]])
 
 summary_coeftest <- coeftest(didreg2, clustered_se)
 print(summary_coeftest)
+
+saveRDS(summary_coeftest, '4_totalbidderintegrity_did_clustered_se.Rds')
 
 distinct_rows <- dv4 %>% distinct(buyer_nuts)
 print(distinct_rows)
