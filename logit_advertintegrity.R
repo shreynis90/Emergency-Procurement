@@ -284,3 +284,5 @@ summary.glm(model1_logit)
 RsqGLM(model1_logit)
 summary(margins(model1_logit))
 
+m = margins(model1_logit)
+stargazer::stargazer(m, type = 'text')

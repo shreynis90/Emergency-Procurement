@@ -1179,6 +1179,7 @@ dv4_out_sumwt <- dv4_out %>% group_by(ID) %>% mutate(sumwt = sum(aftermatchweigh
 dv4_out_sumwt2<- distinct(dv4_out_sumwt)
 didreg = lm(advertintegrity ~ loc*timing +  contractyear + contractmonth + buyer_buyerType + tender_mainCpv + log_contractvalue, data = dv4, weights = aftermatchweight)
 summary(didreg)
+saveRDS(didreg, '5_cont_did_advertperiod.Rds')
 
 dv4_pre_in <- dv4 %>% filter(timing == 0 & loc == 1)
 dv4_pre_out <- dv4 %>% filter(timing == 0 & loc == 0)
@@ -1286,6 +1287,7 @@ cluster_var <- "buyer_nuts"
 didreg2 = lm(advertintegrity ~ loc*timing +  contractyear + contractmonth + buyer_buyerType + tender_mainCpv + log_contractvalue, data = dv4, weights = aftermatchweight)
 
 summary(didreg2)
+saveRDS(didreg2, '5_cont_did_advertperiod2.Rds')
 
 
 clustered_se <- cluster.vcov(didreg2, dv4[[cluster_var]])
