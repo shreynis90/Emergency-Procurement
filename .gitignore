@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.RDataTmp
 
 *.Rproj
 *.xlsx
@@ -12,3 +13,6 @@
 
 # Mac files
 **/*.DS_store
+
+# results dir
+/output/**
