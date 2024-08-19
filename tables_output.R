@@ -8,10 +8,10 @@ library(magrittr)
 library(stargazer)
 
 # regression output ----
-source('did_procedureintegrity.R.R')
-source('did_callintegrity.R.R')
-source('did_advertperiod.R.R')
-source('did_totalbidderintegrity.R.R')
+source('did_procedureintegrity.R')
+source('did_callintegrity.R')
+source('did_advertperiod.R')
+source('did_totalbidderintegrity.R')
 
 source('cont_did_advertintegrity.R')
 source('cont_did_totalbidderintegrity.R')
@@ -44,6 +44,7 @@ c = stargazer::stargazer(
   keep.stat = c('n', 'adj.rsq'),
   type = 'latex',
   object.names = F,
+  table.placement = 'h',
   table.layout = "=-ld-mcta-s-n-",
   notes.align = 'l',
   keep = c('loc:timing', 'timing', 'loc'),
@@ -82,6 +83,14 @@ c = gsub(
   '\\\\begin{tabular}{@{\\\\extracolsep{5pt}}lllll}',
   c
 )
+
+c = gsub('\\\\begin\\{table\\}\\[h\\] \\\\centering ', '', c)
+c = gsub('\\\\caption\\{\\}', '', c)
+c = gsub('\\\\label\\{\\}', '', c)
+c = gsub('\\\\small', '', c)
+
+c = gsub('\\\\end\\{table\\}', '', c)
+
 write(c, 'output/table_9_did.tex')
 
 
@@ -97,6 +106,7 @@ m = list(cont_did_advertperiod,
 c = stargazer::stargazer(
   m,
   header = FALSE,
+  table.placement = 'h',
   keep.stat = c('n', 'adj.rsq'),
   type = 'latex',
   object.names = F,
@@ -106,7 +116,7 @@ c = stargazer::stargazer(
   digits = 3,
   order = c('loc:timing', 'timing', 'loc'),
   covariate.labels = c(
-    'Diff-in-diff (full Period)                         ',
+    'Diff-in-diff (full Period)',
     'Timing (full Period)',
     'Location (full Period)'
   ),
@@ -131,9 +141,17 @@ c = gsub('Observations', '\\\\textit{N (total)}', c)
 c = gsub('Adjusted R\\$\\^\\{2\\}\\$', '\\\\textit{adj R$^{2}$}', c)
 c = gsub(
   '\\\\begin\\{tabular\\}\\{\\@\\{\\\\extracolsep\\{5pt\\}\\}lcc\\}',
-  '\\\\begin{tabular}{p{200pt}p{60pt}p{60pt}}',
+  '\\\\begin{tabular}{p{200pt}p{75pt}p{75pt}}',
   c
 )
+
+c = gsub('\\\\begin\\{table\\}\\[h\\] \\\\centering ', '', c)
+c = gsub('\\\\caption\\{\\}', '', c)
+c = gsub('\\\\label\\{\\}', '', c)
+c = gsub('\\\\small', '', c)
+
+c = gsub('\\\\end\\{table\\}', '', c)
+
 write(c, 'output/table_17_cont_did.tex')
 
 
@@ -178,6 +196,7 @@ n_total_totalbidderintegrity_did = format(n_total_totalbidderintegrity_did, big.
 c = stargazer::stargazer(
   m,
   header = FALSE,
+  table.placement = 'h',
   keep.stat = c('n', 'adj.rsq'),
   type = 'latex',
   object.names = F,
@@ -234,4 +253,12 @@ c = gsub(
   '\\\\begin{tabular}{@{\\\\extracolsep{5pt}}lllll}',
   c
 )
+ 
+c = gsub('\\\\begin\\{table\\}\\[h\\] \\\\centering ', '', c)
+c = gsub('\\\\caption\\{\\}', '', c)
+c = gsub('\\\\label\\{\\}', '', c)
+c = gsub('\\\\small', '', c)
+
+c = gsub('\\\\end\\{table\\}', '', c)
+
 write(c, 'output/table_18_clustered_se.tex')
