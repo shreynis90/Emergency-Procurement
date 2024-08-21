@@ -1,0 +1,18 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.RDataTmp
+
+*.Rproj
+*.xlsx
+
+# Rds regression and SE output
+**/*.Rds
+**/*.html
+
+# Mac files
+**/*.DS_store
+
+# results dir
+/output/**
