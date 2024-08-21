@@ -50,7 +50,6 @@ italy_disaster1$tender_mainCpv
 ##Fixing the dates
 italy_disaster1$contractyear<- ifelse(is.na(italy_disaster1$tender_publications_firstCallForTenderDate), substring(italy_disaster1$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster1$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster1$contractmonth <- ifelse(is.na(italy_disaster1$tender_publications_firstCallForTenderDate), substring(italy_disaster1$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster1$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster1<- italy_disaster1 %>% filter(contractyear>=2008 & contractyear<2013) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 disaster1_date <- as.POSIXct("2009-10-02")
 italy_disaster1 <- subset(italy_disaster1, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
@@ -75,7 +74,6 @@ italy_disaster2$tender_mainCpv
 ##Fixing the dates
 italy_disaster2$contractyear<- ifelse(is.na(italy_disaster2$tender_publications_firstCallForTenderDate), substring(italy_disaster2$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster2$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster2$contractmonth <- ifelse(is.na(italy_disaster2$tender_publications_firstCallForTenderDate), substring(italy_disaster2$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster2$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster2<- italy_disaster2 %>% filter(contractyear>=2009 & contractyear<2016) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 italy_disaster2 <- subset(italy_disaster2, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster2_date <- as.POSIXct("2012-05-29")
@@ -100,7 +98,6 @@ italy_disaster3$tender_mainCpv
 ##Fixing the dates
 italy_disaster3$contractyear<- ifelse(is.na(italy_disaster3$tender_publications_firstCallForTenderDate), substring(italy_disaster3$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster3$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster3$contractmonth <- ifelse(is.na(italy_disaster3$tender_publications_firstCallForTenderDate), substring(italy_disaster3$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster3$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster3<- italy_disaster3 %>% filter(contractyear>=2010 & contractyear<2017) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 italy_disaster3 <- subset(italy_disaster3, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster3_date <- as.POSIXct("2013-11-18")
@@ -126,7 +123,6 @@ italy_disaster4$tender_mainCpv
 ##Fixing the dates
 italy_disaster4$contractyear<- ifelse(is.na(italy_disaster4$tender_publications_firstCallForTenderDate), substring(italy_disaster4$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster4$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster4$contractmonth <- ifelse(is.na(italy_disaster4$tender_publications_firstCallForTenderDate), substring(italy_disaster4$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster4$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster4<- italy_disaster4 %>% filter(contractyear>=2013 & contractyear<2020) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 italy_disaster4 <- subset(italy_disaster4, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster4_date <- as.POSIXct("2016-08-24")
@@ -152,7 +148,6 @@ italy_disaster5$tender_mainCpv
 ##Fixing the dates
 italy_disaster5$contractyear<- ifelse(is.na(italy_disaster5$tender_publications_firstCallForTenderDate), substring(italy_disaster5$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster5$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster5$contractmonth <- ifelse(is.na(italy_disaster5$tender_publications_firstCallForTenderDate), substring(italy_disaster5$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster5$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster5<- italy_disaster5 %>% filter(contractyear>=2014 & contractyear<=2020) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 italy_disaster5 <- subset(italy_disaster5, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster5_date <- as.POSIXct("2017-01-18")
