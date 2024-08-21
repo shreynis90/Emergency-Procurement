@@ -224,61 +224,27 @@ italy_reg <- italy_reg %>% filter(!is.na(log_contractvalue))
 italy_reg$buyer<- ifelse(italy_reg$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
 italy_reg$newcpv <- ifelse(italy_reg$tender_mainCpv == 33, 33, 100)
 
+italy_reg$contractdate <- as.Date(paste(italy_reg$contractyear, italy_reg$contractmonth, "01", sep = "-"), "%Y-%m-%d")
 
+filter_by_disaster <- function(data) {
+  data %>% 
+    filter(
+      !(disnumber == "Disaster_001" & contractdate >= as.Date("2009-10-01") & contractdate < as.Date("2010-10-01")) &
+        !(disnumber == "Disaster_002" & contractdate >= as.Date("2012-05-01") & contractdate < as.Date("2013-05-01")) &
+        !(disnumber == "Disaster_003" & contractdate >= as.Date("2013-11-01") & contractdate < as.Date("2014-11-01")) &
+        !(disnumber == "Disaster_004" & contractdate >= as.Date("2016-08-01") & contractdate < as.Date("2017-08-01")) &
+        !(disnumber == "Disaster_005" & contractdate >= as.Date("2017-01-01") & contractdate < as.Date("2018-01-01"))
+    )
+}
 
-model_logit<- glm(advertintegrity ~ treatmentstatus + factor(newcpv) + buyer+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg)
+# Apply the filtering function to the dataframe
+italy_reg_filtered <- filter_by_disaster(italy_reg)
+
+model_logit<- glm(advertintegrity ~ treatmentstatus + factor(newcpv) + buyer+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg_filtered
+                  )
 summary.glm(model_logit)
 RsqGLM(model_logit)
 summary(margins(model_logit))
 
-
-##3 year Regressions ----
-italy_reg3<- rbind(italy_disaster1_1_3,italy_disaster2_1_3,italy_disaster3_1_3,italy_disaster4_1_3, italy_disaster5_1_3)
-italy_reg3$contractvalue <- ifelse(is.na(italy_reg3$tender_finalPrice_EUR), ifelse(is.na(italy_reg3$tender_estimatedPrice_EUR),"",italy_reg3$tender_estimatedPrice_EUR),italy_reg3$tender_finalPrice_EUR)
-italy_reg3$log_contractvalue <- log(as.numeric(as.character(italy_reg3$contractvalue)))
-italy_reg3 <- italy_reg3 %>% filter(!is.na(log_contractvalue))
-
-
-italy_reg3$buyer<- ifelse(italy_reg3$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg3$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
-italy_reg3$newcpv <- ifelse(italy_reg3$tender_mainCpv == 33, 33, 100)
-
-
-model3_logit<- glm(advertintegrity ~ treatmentstatus + factor(newcpv) + buyer + log_contractvalue + contractmonth, family ="binomial", data = italy_reg3)
-summary.glm(model3_logit)
-RsqGLM(model3_logit)
-
-summary(margins(model3_logit))
-
-
-##2 year Regressions ----
-italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
-italy_reg2$contractvalue <- ifelse(is.na(italy_reg2$tender_finalPrice_EUR), ifelse(is.na(italy_reg2$tender_estimatedPrice_EUR),"",italy_reg2$tender_estimatedPrice_EUR),italy_reg2$tender_finalPrice_EUR)
-italy_reg2$log_contractvalue <- log(as.numeric(as.character(italy_reg2$contractvalue)))
-italy_reg2 <- italy_reg2 %>% filter(!is.na(log_contractvalue))
-
-italy_reg2$buyer<- ifelse(italy_reg2$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg2$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
-italy_reg2$newcpv <- ifelse(italy_reg2$tender_mainCpv == 33, 33, 100)
-
-
-model2_logit<- glm(advertintegrity ~ treatmentstatus + log_contractvalue + contractyear + contractmonth + factor(newcpv) + buyer, family ="binomial", data = italy_reg2)
-summary.glm(model2_logit)
-RsqGLM(model2_logit)
-summary(margins(model2_logit))
-
-##1 year Regressions ----
-italy_reg1<- rbind(italy_disaster1_1_1,italy_disaster2_1_1,italy_disaster3_1_1,italy_disaster4_1_1, italy_disaster5_1_1)
-italy_reg1$contractvalue <- ifelse(is.na(italy_reg1$tender_finalPrice_EUR), ifelse(is.na(italy_reg1$tender_estimatedPrice_EUR),"",italy_reg1$tender_estimatedPrice_EUR),italy_reg1$tender_finalPrice_EUR)
-italy_reg1$log_contractvalue <- log(as.numeric(as.character(italy_reg1$contractvalue)))
-italy_reg1 <- italy_reg1 %>% filter(!is.na(log_contractvalue))
-
-
-italy_reg1$buyer<- ifelse(italy_reg1$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg1$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
-italy_reg1$newcpv <- ifelse(italy_reg1$tender_mainCpv == 33, 33, 100)
-
-model1_logit<- glm(advertintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue + buyer, family ="binomial", data = italy_reg1)
-summary.glm(model1_logit)
-RsqGLM(model1_logit)
-summary(margins(model1_logit))
-
-m = margins(model1_logit)
+m = margins(model_logit)
 stargazer::stargazer(m, type = 'text')
