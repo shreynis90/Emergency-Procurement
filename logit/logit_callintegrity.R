@@ -277,4 +277,46 @@ italy_reg1$newcpv <- ifelse(italy_reg1$tender_mainCpv == 33, 33, 100)
 model1_logit<- glm(callintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue + buyer, family ="binomial", data = italy_reg1)
 summary.glm(model1_logit)
 RsqGLM(model1_logit)
-summary(margins(model2_logit))
+summary(margins(model1_logit))
+
+
+
+##full priod clustered standard errors:
+
+
+library(multiwayvcov)
+library(lmtest)
+
+cluster_var <- "buyer_nuts"
+
+# Summarize the model
+summary(model_logit)
+
+# Calculate clustered standard errors
+clustered_se <- cluster.vcov(model_logit, italy_reg[[cluster_var]])
+
+# Use coeftest with clustered standard errors
+summary_coeftest <- coeftest(model_logit, vcov = clustered_se)
+
+# Print the coefficients with clustered standard errors
+print(summary_coeftest)
+
+# Calculate and print marginal effects
+margins_model <- margins(model_logit, vcov = clustered_se)
+print(summary(margins_model))
+
+##1 year clustered standard errors:
+
+# Calculate clustered standard errors
+clustered_se_model1 <- cluster.vcov(model1_logit, italy_reg1[[cluster_var]])
+
+# Use coeftest with clustered standard errors
+summary_coeftest_model1 <- coeftest(model1_logit, vcov = clustered_se_model1)
+
+# Print the coefficients with clustered standard errors
+print(summary_coeftest_model1)
+
+# Calculate and print marginal effects
+margins_model1 <- margins(model1_logit, vcov = clustered_se_model1)
+print(summary(margins_model1))
+
