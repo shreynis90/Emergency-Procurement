@@ -31,12 +31,9 @@ diff<- median(round(difftime(italy_temp$tender_bidDeadline, italy_temp$tender_pu
 italy$tender_publications_firstCallForTenderDate <- fifelse(italy$contractDate<"2011-01-01", italy$tender_bidDeadline - days(diff), italy$tender_publications_firstCallForTenderDate)
 italy<- italy %>% filter(contractDate> as.POSIXct("2000-01-01", "%Y-%m-%d",tz="GMT"))
 
-#Dropping missings and creating a new variable for totalbidder integrity ----
-##Removing Missings 
-italy<- italy %>% filter(!is.na(lot_bidsCount))
-
-##Declaring a Trimmed bidder number variable
-italy$totalbidderintegrity <- ifelse(italy$lot_bidsCount > 0, 1, 0)
+#Dropping missings and creating a new variable for advertisement integrity ----
+italy<- italy %>% filter(!is.na(tender_indicator_INTEGRITY_ADVERTISEMENT_PERIOD))
+italy$advertintegrity <- ifelse(italy$tender_indicator_INTEGRITY_ADVERTISEMENT_PERIOD == 0, 1, 0)
 
 #Disaster 1 ----
 italy_disaster1<- italy %>%
@@ -53,13 +50,12 @@ italy_disaster1$tender_mainCpv
 ##Fixing the dates
 italy_disaster1$contractyear<- ifelse(is.na(italy_disaster1$tender_publications_firstCallForTenderDate), substring(italy_disaster1$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster1$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster1$contractmonth <- ifelse(is.na(italy_disaster1$tender_publications_firstCallForTenderDate), substring(italy_disaster1$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster1$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster1<- italy_disaster1 %>% filter(contractyear>=2008 & contractyear<2013) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 disaster1_date <- as.POSIXct("2009-10-02")
 italy_disaster1 <- subset(italy_disaster1, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 
 italy_disaster1$Date <- as.yearmon(paste(italy_disaster1$contractmonth, italy_disaster1$contractyear), "%m %Y")
-ncontracts1 <- italy_disaster1 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, totalbidderintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, totalbidderintegrity) %>% distinct()
+ncontracts1 <- italy_disaster1 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, advertintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, advertintegrity) %>% distinct()
 
 ncontracts1
 
@@ -77,15 +73,13 @@ italy_disaster2$tender_mainCpv
 
 ##Fixing the dates
 italy_disaster2$contractyear<- ifelse(is.na(italy_disaster2$tender_publications_firstCallForTenderDate), substring(italy_disaster2$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster2$tender_publications_firstCallForTenderDate,1,4)) #Contract year
-italy_disaster2$contractmonth <- ifelse(is.na(italy_disaster2$tender_publications_firstCallForTenderDate), substring(italy_disaster2$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster2$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster2<- italy_disaster2 %>% filter(contractyear>=2009 & contractyear<2016) #Range of the Data (Full data goes from 2006 to 2020)
-##
+italy_disaster2$contractmonth <- ifelse(is.na(italy_disaster2$tender_publications_firstCallForTenderDate), substring(italy_disaster2$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster2$tender_publications_firstCallForTenderDate,6,7)) #Contract month##
 italy_disaster2 <- subset(italy_disaster2, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster2_date <- as.POSIXct("2012-05-29")
 
 ###Number of Contracts ----
 italy_disaster2$Date <- as.yearmon(paste(italy_disaster2$contractmonth, italy_disaster2$contractyear), "%m %Y")
-ncontracts2 <- italy_disaster2 %>% filter(treatcon == 1) %>% group_by(Date, totalbidderintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, totalbidderintegrity) %>% distinct()
+ncontracts2 <- italy_disaster2 %>% filter(treatcon == 1) %>% group_by(Date, advertintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, advertintegrity) %>% distinct()
 
 ##Disaster 3 ----
 #Removing contracts from other disaster areas#
@@ -103,14 +97,13 @@ italy_disaster3$tender_mainCpv
 ##Fixing the dates
 italy_disaster3$contractyear<- ifelse(is.na(italy_disaster3$tender_publications_firstCallForTenderDate), substring(italy_disaster3$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster3$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster3$contractmonth <- ifelse(is.na(italy_disaster3$tender_publications_firstCallForTenderDate), substring(italy_disaster3$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster3$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster3<- italy_disaster3 %>% filter(contractyear>=2010 & contractyear<2017) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 italy_disaster3 <- subset(italy_disaster3, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster3_date <- as.POSIXct("2013-11-18")
 
 ###Number of Contracts ----
 italy_disaster3$Date <- as.yearmon(paste(italy_disaster3$contractmonth, italy_disaster3$contractyear), "%m %Y")
-ncontracts3 <- italy_disaster3 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, totalbidderintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, totalbidderintegrity) %>% distinct()
+ncontracts3 <- italy_disaster3 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, advertintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, advertintegrity) %>% distinct()
 
 
 ##Disaster 4 ----
@@ -129,14 +122,13 @@ italy_disaster4$tender_mainCpv
 ##Fixing the dates
 italy_disaster4$contractyear<- ifelse(is.na(italy_disaster4$tender_publications_firstCallForTenderDate), substring(italy_disaster4$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster4$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster4$contractmonth <- ifelse(is.na(italy_disaster4$tender_publications_firstCallForTenderDate), substring(italy_disaster4$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster4$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster4<- italy_disaster4 %>% filter(contractyear>=2013 & contractyear<2020) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 italy_disaster4 <- subset(italy_disaster4, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster4_date <- as.POSIXct("2016-08-24")
 
 ###Number of Contracts ----
 italy_disaster4$Date <- as.yearmon(paste(italy_disaster4$contractmonth, italy_disaster4$contractyear), "%m %Y")
-ncontracts4 <- italy_disaster4 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, totalbidderintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, totalbidderintegrity) %>% distinct()
+ncontracts4 <- italy_disaster4 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, advertintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, advertintegrity) %>% distinct()
 
 
 ##Disaster 5----
@@ -155,14 +147,13 @@ italy_disaster5$tender_mainCpv
 ##Fixing the dates
 italy_disaster5$contractyear<- ifelse(is.na(italy_disaster5$tender_publications_firstCallForTenderDate), substring(italy_disaster5$tender_publications_firstdContractAwardDate,1,4),substring(italy_disaster5$tender_publications_firstCallForTenderDate,1,4)) #Contract year
 italy_disaster5$contractmonth <- ifelse(is.na(italy_disaster5$tender_publications_firstCallForTenderDate), substring(italy_disaster5$tender_publications_firstdContractAwardDate,6,7),substring(italy_disaster5$tender_publications_firstCallForTenderDate,6,7)) #Contract month
-italy_disaster5<- italy_disaster5 %>% filter(contractyear>=2014 & contractyear<=2020) #Range of the Data (Full data goes from 2006 to 2020)
 ##
 italy_disaster5 <- subset(italy_disaster5, !(is.na(tender_publications_firstCallForTenderDate) & contractyear<2011))
 disaster5_date <- as.POSIXct("2017-01-18")
 
 ###Number of Contracts ----
 italy_disaster5$Date <- as.yearmon(paste(italy_disaster5$contractmonth, italy_disaster5$contractyear), "%m %Y")
-ncontracts5 <- italy_disaster5 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, totalbidderintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, totalbidderintegrity) %>% distinct()
+ncontracts5 <- italy_disaster5 %>% filter(treatcon == 1) %>% group_by(Date, treatcon, advertintegrity)%>% mutate(numberofcontracts = n()) %>% dplyr::select(Date, numberofcontracts, treatcon, disnumber, advertintegrity) %>% distinct()
 
 
 ##Treated Contracts by disaster ----
@@ -233,57 +224,27 @@ italy_reg <- italy_reg %>% filter(!is.na(log_contractvalue))
 italy_reg$buyer<- ifelse(italy_reg$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
 italy_reg$newcpv <- ifelse(italy_reg$tender_mainCpv == 33, 33, 100)
 
-model_logit<- glm(totalbidderintegrity ~ treatmentstatus + factor(newcpv) + buyer+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg)
+italy_reg$contractdate <- as.Date(paste(italy_reg$contractyear, italy_reg$contractmonth, "01", sep = "-"), "%Y-%m-%d")
+
+filter_by_disaster <- function(data) {
+  data %>% 
+    filter(
+      !(disnumber == "Disaster_001" & contractdate >= as.Date("2009-10-01") & contractdate < as.Date("2010-10-01")) &
+        !(disnumber == "Disaster_002" & contractdate >= as.Date("2012-05-01") & contractdate < as.Date("2013-05-01")) &
+        !(disnumber == "Disaster_003" & contractdate >= as.Date("2013-11-01") & contractdate < as.Date("2014-11-01")) &
+        !(disnumber == "Disaster_004" & contractdate >= as.Date("2016-08-01") & contractdate < as.Date("2017-08-01")) &
+        !(disnumber == "Disaster_005" & contractdate >= as.Date("2017-01-01") & contractdate < as.Date("2018-01-01"))
+    )
+}
+
+# Apply the filtering function to the dataframe
+italy_reg_filtered <- filter_by_disaster(italy_reg)
+
+model_logit<- glm(advertintegrity ~ treatmentstatus + factor(newcpv) + buyer+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg_filtered
+                  )
 summary.glm(model_logit)
 RsqGLM(model_logit)
 summary(margins(model_logit))
 
-
-##3 year Regressions ----
-italy_reg3<- rbind(italy_disaster1_1_3,italy_disaster2_1_3,italy_disaster3_1_3,italy_disaster4_1_3, italy_disaster5_1_3)
-italy_reg3$contractvalue <- ifelse(is.na(italy_reg3$tender_finalPrice_EUR), ifelse(is.na(italy_reg3$tender_estimatedPrice_EUR),"",italy_reg3$tender_estimatedPrice_EUR),italy_reg3$tender_finalPrice_EUR)
-italy_reg3$log_contractvalue <- log(as.numeric(as.character(italy_reg3$contractvalue)))
-italy_reg3 <- italy_reg3 %>% filter(!is.na(log_contractvalue))
-
-
-italy_reg3$buyer<- ifelse(italy_reg3$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg3$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
-italy_reg3$newcpv <- ifelse(italy_reg3$tender_mainCpv == 33, 33, 100)
-
-
-model3_logit<- glm(totalbidderintegrity ~ treatmentstatus + factor(newcpv) + buyer + log_contractvalue + contractmonth, family ="binomial", data = italy_reg3)
-summary.glm(model3_logit)
-RsqGLM(model3_logit)
-
-summary(margins(model3_logit))
-
-
-##2 year Regressions ----
-italy_reg2<- rbind(italy_disaster1_1_2,italy_disaster2_1_2,italy_disaster3_1_2,italy_disaster4_1_2, italy_disaster5_1_2)
-italy_reg2$contractvalue <- ifelse(is.na(italy_reg2$tender_finalPrice_EUR), ifelse(is.na(italy_reg2$tender_estimatedPrice_EUR),"",italy_reg2$tender_estimatedPrice_EUR),italy_reg2$tender_finalPrice_EUR)
-italy_reg2$log_contractvalue <- log(as.numeric(as.character(italy_reg2$contractvalue)))
-italy_reg2 <- italy_reg2 %>% filter(!is.na(log_contractvalue))
-
-italy_reg2$buyer<- ifelse(italy_reg2$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg2$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
-italy_reg2$newcpv <- ifelse(italy_reg2$tender_mainCpv == 33, 33, 100)
-
-
-model2_logit<- glm(totalbidderintegrity ~ treatmentstatus + log_contractvalue + contractyear + contractmonth + factor(newcpv) + buyer, family ="binomial", data = italy_reg2)
-summary.glm(model2_logit)
-RsqGLM(model2_logit)
-summary(margins(model2_logit))
-
-##1 year Regressions ----
-italy_reg1<- rbind(italy_disaster1_1_1,italy_disaster2_1_1,italy_disaster3_1_1,italy_disaster4_1_1, italy_disaster5_1_1)
-italy_reg1$contractvalue <- ifelse(is.na(italy_reg1$tender_finalPrice_EUR), ifelse(is.na(italy_reg1$tender_estimatedPrice_EUR),"",italy_reg1$tender_estimatedPrice_EUR),italy_reg1$tender_finalPrice_EUR)
-italy_reg1$log_contractvalue <- log(as.numeric(as.character(italy_reg1$contractvalue)))
-italy_reg1 <- italy_reg1 %>% filter(!is.na(log_contractvalue))
-
-
-italy_reg1$buyer<- ifelse(italy_reg1$buyer_buyerType=="REGIONAL_AUTHORITY"|italy_reg1$buyer_buyerType=="REGIONAL_AGENCY", "Regional", "Other")
-italy_reg1$newcpv <- ifelse(italy_reg1$tender_mainCpv == 33, 33, 100)
-
-model1_logit<- glm(totalbidderintegrity ~ treatmentstatus + contractmonth + contractyear + factor(newcpv) + log_contractvalue + buyer, family ="binomial", data = italy_reg1)
-summary.glm(model1_logit)
-RsqGLM(model1_logit)
-summary(margins(model1_logit))
-
+m = margins(model_logit)
+stargazer::stargazer(m, type = 'text')
