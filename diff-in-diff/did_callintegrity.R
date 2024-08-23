@@ -1173,94 +1173,53 @@ dv4_pre_in <- dv4 %>% filter(timing == 0 & loc == 1)
 dv4_pre_out <- dv4 %>% filter(timing == 0 & loc == 0)
 
 t.test(dv4_pre_in$callintegrity,dv4_pre_out$callintegrity, paired = FALSE, conf.level = 0.90)
-##Computations of graph ----
-disaster1_final$contractmonth <- as.integer(disaster1_final$contractmonth)
-disaster2_final$contractmonth <- as.integer(disaster2_final$contractmonth)
-disaster3_final$contractmonth <- as.integer(disaster3_final$contractmonth)
-disaster4_final$contractmonth <- as.integer(disaster4_final$contractmonth)
-disaster5_final$contractmonth <- as.integer(disaster5_final$contractmonth)
+###matched t-tests for 3, 2, 1 years
 
+disaster1_final$year <- format(as.Date(disaster1_final$contractdate), "%Y")
+disaster2_final$year <- format(as.Date(disaster2_final$contractdate), "%Y")
+disaster3_final$year <- format(as.Date(disaster3_final$contractdate), "%Y")
+disaster4_final$year <- format(as.Date(disaster4_final$contractdate), "%Y")
+disaster5_final$year <- format(as.Date(disaster5_final$contractdate), "%Y")
 ##Oneyear ----
-d1_oneyear <- disaster1_final %>% filter(contractyear == 2008|contractyear == 2010) %>% filter(loc == 1)
-d2_oneyear <- disaster2_final %>% filter((contractyear == 2011)|contractyear == 2013)%>% filter(loc == 1)
-d3_oneyear <- disaster3_final %>% filter(contractyear == 2012|contractyear == 2014)%>% filter(loc == 1)
-d4_oneyear <- disaster4_final %>% filter(contractyear == 2015|contractyear == 2017)%>% filter(loc == 1)
-d5_oneyear <- disaster5_final %>% filter(contractyear == 2016|contractyear == 2018)%>% filter(loc == 1)
+d1_oneyear <- disaster1_final %>% filter(year >= 2008 & year <= 2010) %>% filter(loc == 1)
+d2_oneyear <- disaster2_final %>% filter((year >= 2011) & year <= 2013)%>% filter(loc == 1)
+d3_oneyear <- disaster3_final %>% filter(year >= 2012 & year <= 2014)%>% filter(loc == 1)
+d4_oneyear <- disaster4_final %>% filter(year >= 2015 & year <= 2017)%>% filter(loc == 1)
+d5_oneyear <- disaster5_final %>% filter(year >= 2016 & year <= 2018)%>% filter(loc == 1)
 
 d_oneyear <- rbind(d1_oneyear,d2_oneyear,d3_oneyear,d4_oneyear,d5_oneyear)
-d_oneyear_1<- transform(d_oneyear, freq.loc = ave(seq(nrow(d_oneyear)), buyer_name, FUN=length))
-d_oneyear_2<- d_oneyear_1 %>% filter(freq.loc>1)
-
-
-d_oneyearpre <- d_oneyear_2 %>% filter(timing == 0)
-d_oneyearpost <- d_oneyear_2 %>% filter(timing == 1)
-
-t.test(d_oneyearpost$callintegrity)
-t.test(d_oneyearpre$callintegrity)
+d_oneyearpost <- d_oneyear %>% filter(timing == 1)
+d_oneyearpre <- d_oneyear %>% filter(timing == 0)
+matched_comparison_oneyear <- t.test(d_oneyearpost$callintegrity,d_oneyearpre$callintegrity, paired = FALSE, conf.level = 0.90)
 
 ##Two year ----
-d1_twoyear <- disaster1_final %>% filter(contractyear == 2007|contractyear == 2011)%>% filter(loc == 1)
-d2_twoyear <- disaster2_final %>% filter(contractyear == 2010|contractyear == 2014)%>% filter(loc == 1)
-d3_twoyear <- disaster3_final %>% filter(contractyear == 2011|contractyear == 2015)%>% filter(loc == 1)
-d4_twoyear <- disaster4_final %>% filter(contractyear == 2014|contractyear == 2018)%>% filter(loc == 1)
-d5_twoyear <- disaster5_final %>% filter(contractyear == 2015|contractyear == 2019)%>% filter(loc == 1)
+d1_twoyear <- disaster1_final %>% filter(year >= 2007 & year <= 2011) %>% filter(loc == 1)
+d2_twoyear <- disaster2_final %>% filter((year >= 2010) & year <= 2014)%>% filter(loc == 1)
+d3_twoyear <- disaster3_final %>% filter(year >= 2011 & year <= 2015)%>% filter(loc == 1)
+d4_twoyear <- disaster4_final %>% filter(year >= 2014 & year <= 2018)%>% filter(loc == 1)
+d5_twoyear <- disaster5_final %>% filter(year >= 2015 & year <= 2019)%>% filter(loc == 1)
 
 d_twoyear <- rbind(d1_twoyear,d2_twoyear,d3_twoyear,d4_twoyear,d5_twoyear)
-d_twoyear_1<- transform(d_twoyear, freq.loc = ave(seq(nrow(d_twoyear)), buyer_name, FUN=length))
-d_twoyear_2<- d_twoyear_1 %>% filter(freq.loc>1)
-
-
-d_twoyearpre <- d_twoyear_2 %>% filter(timing == 0)
-d_twoyearpost <- d_twoyear_2 %>% filter(timing == 1)
-
-
-t.test(d_twoyearpost$callintegrity)
-t.test(d_twoyearpre$callintegrity)
-
+d_twoyearpost <- d_twoyear %>% filter(timing == 1)
+d_twoyearpre <- d_twoyear %>% filter(timing == 0)
+matched_comparison_twoyear <- t.test(d_twoyearpost$callintegrity,d_oneyearpre$callintegrity, paired = FALSE, conf.level = 0.90)
 
 ##Threeyear
 
-d1_threeyear <- disaster1_final %>% filter(contractyear == 2006|contractyear == 2012)%>% filter(loc == 1)
+d1_threeyear <- disaster1_final %>% filter(year >= 2006 & year <= 2012)%>% filter(loc == 1)
 
-d2_threeyear <- disaster2_final %>% filter(contractyear == 2009|contractyear == 2015)%>% filter(loc == 1)
+d2_threeyear <- disaster2_final %>% filter(year >= 2009 & year <= 2015)%>% filter(loc == 1)
 
-d3_threeyear <- disaster3_final %>% filter(contractyear == 2010|contractyear == 2016)%>% filter(loc == 1)
-d4_threeyear <- disaster4_final %>% filter(contractyear == 2013|contractyear == 2019)%>% filter(loc == 1)
-d5_threeyear <- disaster5_final %>% filter(contractyear == 2014|contractyear == 2020)%>% filter(loc == 1)
+d3_threeyear <- disaster3_final %>% filter(year >= 2010 & year <= 2016)%>% filter(loc == 1)
+d4_threeyear <- disaster4_final %>% filter(year >= 2013 & year <= 2019)%>% filter(loc == 1)
+d5_threeyear <- disaster5_final %>% filter(year >= 2014 & year <= 2020)%>% filter(loc == 1)
 
 
 d_threeyear <- rbind(d1_threeyear,d2_threeyear,d3_threeyear,d4_threeyear,d5_threeyear)
-d_threeyear_1<- transform(d_threeyear, freq.loc = ave(seq(nrow(d_threeyear)), buyer_name, FUN=length))
-d_threeyear_2<- d_threeyear_1 %>% filter(freq.loc>0)
 
-
-d_threeyearpre <- d_threeyear_2 %>% filter(timing == 0)
-d_threeyearpost <- d_threeyear_2 %>% filter(timing == 1)
-
-t.test(d_threeyearpost$callintegrity)
-t.test(d_threeyearpre$callintegrity)
-
-##
-year <- c("t =-3", "t =-2", "t =-1","t = 1","t = 2","t = 3")
-meancallintegrity <- c(t.test(d_threeyearpre$callintegrity)$'estimate', t.test(d_twoyearpre$callintegrity)$'estimate',t.test(d_oneyearpre$callintegrity)$'estimate',t.test(d_oneyearpost$callintegrity)$'estimate',t.test(d_twoyearpost$callintegrity)$'estimate',t.test(d_threeyearpost$callintegrity)$'estimate')
-
-lowerbound <- c(t.test(d_threeyearpre$callintegrity)$'conf.int'[1],t.test(d_twoyearpre$callintegrity)$'conf.int'[1],t.test(d_oneyearpre$callintegrity)$'conf.int'[1],t.test(d_oneyearpost$callintegrity)$'conf.int'[1],t.test(d_twoyearpost$callintegrity)$'conf.int'[1],t.test(d_threeyearpost$callintegrity)$'conf.int'[1])
-
-upperbound <- c(t.test(d_threeyearpre$callintegrity)$'conf.int'[2],t.test(d_twoyearpre$callintegrity)$'conf.int'[2],t.test(d_oneyearpre$callintegrity)$'conf.int'[2],t.test(d_oneyearpost$callintegrity)$'conf.int'[2],t.test(d_twoyearpost$callintegrity)$'conf.int'[2],t.test(d_threeyearpost$callintegrity)$'conf.int'[2])
-
-df <- data.frame(year, meancallintegrity, lowerbound,upperbound)
-
-df$year <- factor(df$year, levels = df$year)
-p <- ggplot(df, aes(year, as.numeric(as.character(meancallintegrity)))) +        # ggplot2 plot with confidence intervals
-  geom_point()  +  geom_path(group = 1)  + geom_vline(xintercept = 3.5 , color = "red", linetype = 'solid')+
-  annotate(geom = "text",
-           label = 'Disaster',
-           x = 1,
-           y = 0.5,
-           angle = 90, 
-           vjust = 26) + ylab("Non-publication of tender calls")
-p#+ geom_errorbar( aes(ymin = as.numeric(as.character(lowerbound)), ymax = as.numeric(as.character(upperbound))), width = 0.1, size = 1, color = 'blue')
-
+d_threeyearpre <- d_threeyear %>% filter(timing == 0)
+d_threeyearpost <- d_threeyear %>% filter(timing == 1)
+matched_comparison_threeyear <- t.test(d_threeyearpost$callintegrity,d_threeyearpre$callintegrity, paired = FALSE, conf.level = 0.90)
 
 library(multiwayvcov)
 library(lmtest)

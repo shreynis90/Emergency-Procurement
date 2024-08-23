@@ -1164,90 +1164,53 @@ dv4_pre_out <- dv4 %>% filter(timing == 0 & loc == 0)
 t.test(dv4_pre_in$totalbiddersintegrity,dv4_pre_out$totalbiddersintegrity, paired = FALSE, conf.level = 0.90)
 
 ##Computations of graph ----
+###matched t-tests for 3, 2, 1 years
 
+disaster1_final$year <- format(as.Date(disaster1_final$contractdate), "%Y")
+disaster2_final$year <- format(as.Date(disaster2_final$contractdate), "%Y")
+disaster3_final$year <- format(as.Date(disaster3_final$contractdate), "%Y")
+disaster4_final$year <- format(as.Date(disaster4_final$contractdate), "%Y")
+disaster5_final$year <- format(as.Date(disaster5_final$contractdate), "%Y")
 ##Oneyear ----
-d1_oneyear <- disaster1_final %>% filter(contractyear == 2008|contractyear == 2010) %>% filter(loc == 1)
-d2_oneyear <- disaster2_final %>% filter(contractyear == 2011|contractyear == 2013)%>% filter(loc == 1)
-d3_oneyear <- disaster3_final %>% filter(contractyear == 2012|contractyear == 2014)%>% filter(loc == 1)
-d4_oneyear <- disaster4_final %>% filter(contractyear == 2015|contractyear == 2017)%>% filter(loc == 1)
-d5_oneyear <- disaster5_final %>% filter(contractyear == 2016|contractyear == 2018)%>% filter(loc == 1)
+d1_oneyear <- disaster1_final %>% filter(year >= 2008 & year <= 2010) %>% filter(loc == 1)
+d2_oneyear <- disaster2_final %>% filter((year >= 2011) & year <= 2013)%>% filter(loc == 1)
+d3_oneyear <- disaster3_final %>% filter(year >= 2012 & year <= 2014)%>% filter(loc == 1)
+d4_oneyear <- disaster4_final %>% filter(year >= 2015 & year <= 2017)%>% filter(loc == 1)
+d5_oneyear <- disaster5_final %>% filter(year >= 2016 & year <= 2018)%>% filter(loc == 1)
 
 d_oneyear <- rbind(d1_oneyear,d2_oneyear,d3_oneyear,d4_oneyear,d5_oneyear)
-d_oneyear_1<- transform(d_oneyear, freq.loc = ave(seq(nrow(d_oneyear)), buyer_name, FUN=length))
-d_oneyear_2<- d_oneyear_1 %>% filter(freq.loc>0)
-
-
-d_oneyearpre <- d_oneyear_2 %>% filter(timing == 0)
-d_oneyearpost <- d_oneyear_2 %>% filter(timing == 1)
-
-t.test(d_oneyearpost$totalbiddersintegrity)
-t.test(d_oneyearpre$totalbiddersintegrity)
+d_oneyearpost <- d_oneyear %>% filter(timing == 1)
+d_oneyearpre <- d_oneyear %>% filter(timing == 0)
+matched_comparison_oneyear <- t.test(d_oneyearpost$totalbiddersintegrity,d_oneyearpre$totalbiddersintegrity, paired = FALSE, conf.level = 0.90)
 
 ##Two year ----
-d1_twoyear <- disaster1_final %>% filter(contractyear == 2007|contractyear == 2011)%>% filter(loc == 1)
-d2_twoyear <- disaster2_final %>% filter(contractyear == 2010|contractyear == 2014)%>% filter(loc == 1)
-d3_twoyear <- disaster3_final %>% filter(contractyear == 2011|contractyear == 2015)%>% filter(loc == 1)
-d4_twoyear <- disaster4_final %>% filter(contractyear == 2014|contractyear == 2018)%>% filter(loc == 1)
-d5_twoyear <- disaster5_final %>% filter(contractyear == 2015|contractyear == 2019|contractyear == 2018)%>% filter(loc == 1)
+d1_twoyear <- disaster1_final %>% filter(year >= 2007 & year <= 2011) %>% filter(loc == 1)
+d2_twoyear <- disaster2_final %>% filter((year >= 2010) & year <= 2014)%>% filter(loc == 1)
+d3_twoyear <- disaster3_final %>% filter(year >= 2011 & year <= 2015)%>% filter(loc == 1)
+d4_twoyear <- disaster4_final %>% filter(year >= 2014 & year <= 2018)%>% filter(loc == 1)
+d5_twoyear <- disaster5_final %>% filter(year >= 2015 & year <= 2019)%>% filter(loc == 1)
 
 d_twoyear <- rbind(d1_twoyear,d2_twoyear,d3_twoyear,d4_twoyear,d5_twoyear)
-d_twoyear_1<- transform(d_twoyear, freq.loc = ave(seq(nrow(d_twoyear)), buyer_name, FUN=length))
-d_twoyear_2<- d_twoyear_1 %>% filter(freq.loc>0)
-
-
-d_twoyearpre <- d_twoyear_2 %>% filter(timing == 0)
-d_twoyearpost <- d_twoyear_2 %>% filter(timing == 1)
-
-
-t.test(d_twoyearpost$totalbiddersintegrity)
-t.test(d_twoyearpre$totalbiddersintegrity)
-
+d_twoyearpost <- d_twoyear %>% filter(timing == 1)
+d_twoyearpre <- d_twoyear %>% filter(timing == 0)
+matched_comparison_twoyear <- t.test(d_twoyearpost$totalbiddersintegrity,d_oneyearpre$totalbiddersintegrity, paired = FALSE, conf.level = 0.90)
 
 ##Threeyear
 
-d1_threeyear <- disaster1_final %>% filter(contractyear == 2006|contractyear == 2012)%>% filter(loc == 1)
+d1_threeyear <- disaster1_final %>% filter(year >= 2006 & year <= 2012)%>% filter(loc == 1)
 
-d2_threeyear <- disaster2_final %>% filter(contractyear == 2009|contractyear == 2015)%>% filter(loc == 1)
+d2_threeyear <- disaster2_final %>% filter(year >= 2009 & year <= 2015)%>% filter(loc == 1)
 
-d3_threeyear <- disaster3_final %>% filter(contractyear == 2010|contractyear == 2016)%>% filter(loc == 1)
-d4_threeyear <- disaster4_final %>% filter(contractyear == 2013|contractyear == 2019)%>% filter(loc == 1)
-d5_threeyear <- disaster5_final %>% filter(contractyear == 2014|contractyear == 2020)%>% filter(loc == 1)
+d3_threeyear <- disaster3_final %>% filter(year >= 2010 & year <= 2016)%>% filter(loc == 1)
+d4_threeyear <- disaster4_final %>% filter(year >= 2013 & year <= 2019)%>% filter(loc == 1)
+d5_threeyear <- disaster5_final %>% filter(year >= 2014 & year <= 2020)%>% filter(loc == 1)
 
 
 d_threeyear <- rbind(d1_threeyear,d2_threeyear,d3_threeyear,d4_threeyear,d5_threeyear)
-d_threeyear_1<- transform(d_threeyear, freq.loc = ave(seq(nrow(d_threeyear)), buyer_name, FUN=length))
-d_threeyear_2<- d_threeyear_1 %>% filter(freq.loc>0)
 
-
-d_threeyearpre <- d_threeyear_2 %>% filter(timing == 0)
-d_threeyearpost <- d_threeyear_2 %>% filter(timing == 1)
-
-
-#t.test(d_threeyearpost$totalbiddersintegrity)
-#t.test(d_threeyearpre$totalbiddersintegrity)
-
-##
-year <- c( "t =-2", "t =-1","t = 1","t = 2")
-meantotalbiddersintegrity <- c( t.test(d_twoyearpre$totalbiddersintegrity)$'estimate',t.test(d_oneyearpre$totalbiddersintegrity)$'estimate',t.test(d_oneyearpost$totalbiddersintegrity)$'estimate',t.test(d_twoyearpost$totalbiddersintegrity)$'estimate')
-
-lowerbound <- c(t.test(d_twoyearpre$totalbiddersintegrity)$'conf.int'[1],t.test(d_oneyearpre$totalbiddersintegrity)$'conf.int'[1],t.test(d_oneyearpost$totalbiddersintegrity)$'conf.int'[1],t.test(d_twoyearpost$totalbiddersintegrity)$'conf.int'[1])
-
-upperbound <- c(t.test(d_twoyearpre$totalbiddersintegrity)$'conf.int'[2],t.test(d_oneyearpre$totalbiddersintegrity)$'conf.int'[2],t.test(d_oneyearpost$totalbiddersintegrity)$'conf.int'[2],t.test(d_twoyearpost$totalbiddersintegrity)$'conf.int'[2])
-
-df <- data.frame(year, meantotalbiddersintegrity, lowerbound,upperbound)
-
-df$year <- factor(df$year, levels = df$year)
-p <- ggplot(df, aes(year, as.numeric(as.character(meantotalbiddersintegrity)))) +        # ggplot2 plot with confidence intervals
-  geom_point()  +  geom_path(group = 1)  + geom_vline(xintercept = 2.5 , color = "red", linetype = 'solid')+
-  annotate(geom = "text",
-           label = 'Disaster',
-           x = 1,
-           y = 0.12,
-           angle = 90, 
-           vjust = 23) + ylab("Single Bidding")
-p#+ geom_errorbar( aes(ymin = as.numeric(as.character(lowerbound)), ymax = as.numeric(as.character(upperbound))), width = 0.1, size = 1, color = 'blue')
-
-
+d_threeyearpre <- d_threeyear %>% filter(timing == 0)
+d_threeyearpost <- d_threeyear %>% filter(timing == 1)
+matched_comparison_threeyear <- t.test(d_threeyearpost$totalbiddersintegrity,d_threeyearpre$totalbiddersintegrity, paired = FALSE, conf.level = 0.90)
 ###Clustering Standard errors:
 
 #install.packages("multiwayvcov")
