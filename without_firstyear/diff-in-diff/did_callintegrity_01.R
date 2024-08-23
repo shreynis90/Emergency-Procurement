@@ -1207,6 +1207,57 @@ dv4_pre_out <- dv4 %>% filter(timing == 0 & loc == 0)
 
 t.test(dv4_pre_in$callintegrity,dv4_pre_out$callintegrity, paired = FALSE, conf.level = 0.90)
 
+
+###matched t-tests for 3, 2, 1 years
+
+disaster1_final$year <- format(as.Date(disaster1_final$contractdate), "%Y")
+disaster2_final$year <- format(as.Date(disaster2_final$contractdate), "%Y")
+disaster3_final$year <- format(as.Date(disaster3_final$contractdate), "%Y")
+disaster4_final$year <- format(as.Date(disaster4_final$contractdate), "%Y")
+disaster5_final$year <- format(as.Date(disaster5_final$contractdate), "%Y")
+##Oneyear ----
+d1_oneyear <- disaster1_final %>% filter(year >= 2008 & year <= 2010) %>% filter(loc == 1)
+d2_oneyear <- disaster2_final %>% filter((year >= 2011) & year <= 2013)%>% filter(loc == 1)
+d3_oneyear <- disaster3_final %>% filter(year >= 2012 & year <= 2014)%>% filter(loc == 1)
+d4_oneyear <- disaster4_final %>% filter(year >= 2015 & year <= 2017)%>% filter(loc == 1)
+d5_oneyear <- disaster5_final %>% filter(year >= 2016 & year <= 2018)%>% filter(loc == 1)
+
+d_oneyear <- rbind(d1_oneyear,d2_oneyear,d3_oneyear,d4_oneyear,d5_oneyear)
+d_oneyearpost <- d_oneyear %>% filter(timing == 1)
+d_oneyearpre <- d_oneyear %>% filter(timing == 0)
+matched_comparison_oneyear <- t.test(d_oneyearpost$callintegrity,d_oneyearpre$callintegrity, paired = FALSE, conf.level = 0.90)
+
+##Two year ----
+d1_twoyear <- disaster1_final %>% filter(year >= 2007 & year <= 2011) %>% filter(loc == 1)
+d2_twoyear <- disaster2_final %>% filter((year >= 2010) & year <= 2014)%>% filter(loc == 1)
+d3_twoyear <- disaster3_final %>% filter(year >= 2011 & year <= 2015)%>% filter(loc == 1)
+d4_twoyear <- disaster4_final %>% filter(year >= 2014 & year <= 2018)%>% filter(loc == 1)
+d5_twoyear <- disaster5_final %>% filter(year >= 2015 & year <= 2019)%>% filter(loc == 1)
+
+d_twoyear <- rbind(d1_twoyear,d2_twoyear,d3_twoyear,d4_twoyear,d5_twoyear)
+d_twoyearpost <- d_twoyear %>% filter(timing == 1)
+d_twoyearpre <- d_twoyear %>% filter(timing == 0)
+matched_comparison_twoyear <- t.test(d_twoyearpost$callintegrity,d_oneyearpre$callintegrity, paired = FALSE, conf.level = 0.90)
+
+##Threeyear
+
+d1_threeyear <- disaster1_final %>% filter(year >= 2006 & year <= 2012)%>% filter(loc == 1)
+
+d2_threeyear <- disaster2_final %>% filter(year >= 2009 & year <= 2015)%>% filter(loc == 1)
+
+d3_threeyear <- disaster3_final %>% filter(year >= 2010 & year <= 2016)%>% filter(loc == 1)
+d4_threeyear <- disaster4_final %>% filter(year >= 2013 & year <= 2019)%>% filter(loc == 1)
+d5_threeyear <- disaster5_final %>% filter(year >= 2014 & year <= 2020)%>% filter(loc == 1)
+
+
+d_threeyear <- rbind(d1_threeyear,d2_threeyear,d3_threeyear,d4_threeyear,d5_threeyear)
+
+d_threeyearpre <- d_threeyear %>% filter(timing == 0)
+d_threeyearpost <- d_threeyear %>% filter(timing == 1)
+matched_comparison_threeyear <- t.test(d_threeyearpost$callintegrity,d_threeyearpre$callintegrity, paired = FALSE, conf.level = 0.90)
+
+#clustered standard errors
+
 library(multiwayvcov)
 library(lmtest)
 
