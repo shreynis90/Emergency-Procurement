@@ -14,3 +14,5 @@
   * The variable matched_comparison gives the before-after t-tests.
   * The variable didreg gives the results of the diff-in-diff regressions.
   * The variable didreg2 gives the results of the diff-in-diff regressions with standard errors clustered at the NUTS 3 level
+4. The folder without first year has the codes for analysis without the first year after disasters.
+  * The naming of files within this folder follows the naming convention mentioned above.
