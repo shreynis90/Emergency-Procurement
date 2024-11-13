@@ -243,9 +243,23 @@ filter_by_disaster <- function(data) {
 italy_reg_filtered <- filter_by_disaster(italy_reg)
 
 model_logit<- glm(procedureintegrity ~ treatmentstatus + factor(newcpv) + buyer+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg_filtered)
-summary.glm(model_logit)
-RsqGLM(model_logit)
-summary(margins(model_logit))
+
+saveRDS(model_logit, 'tables/robustness/table_21/1_logit_procedureintegrity_01_model.rds')
+
+n_after = sum(italy_reg_filtered$treatmentstatus[italy_reg_filtered$treatmentstatus == 1])
+
+saveRDS(n_after, 'tables/robustness/table_21/1_logit_procedureintegrity_01_n_after.rds')
 
 
+# summary.glm(model_logit)
+
+saveRDS(RsqGLM(model_logit), 'tables/robustness/table_21/1_logit_procedureintegrity_01_se.rds')
+
+# summary(margins(model_logit))
+
+
+m <- margins::margins(model_logit, variables = c('treatmentstatus'), type = "response") %>% 
+  broom::tidy() %>% 
+  mutate(term = 'Non-open Procedure')
+saveRDS(m, 'tables/robustness/table_21/1_logit_procedureintegrity_01.rds')
 

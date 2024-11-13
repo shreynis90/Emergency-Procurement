@@ -281,7 +281,15 @@ summary(margins(model1_logit))
 
 
 
-##full priod clustered standard errors:
+# Monte-Carlo analysis and Bootstrapping ----
+#-------------------------------------------------#
+# TODO: Add Monte-Carlo analysis and Bootstrapping
+saveRDS(italy_reg, 'logit_callintegrity.Rds')
+
+readRDS('logit_callintegrity.Rds')
+#-------------------------------------------------#
+
+##full period clustered standard errors:
 
 
 library(multiwayvcov)

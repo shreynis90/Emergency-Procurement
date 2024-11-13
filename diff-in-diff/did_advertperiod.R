@@ -1153,9 +1153,15 @@ dv1_matched_ttest_pre <- dv1_matched_ttest %>% filter(timing == 0)
 dv1_matched_ttest_post <- dv1_matched_ttest%>% filter(timing == 1)
 
 
+
 matched_comparison<- t.test(dv1_matched_ttest_post$advertintegrity,dv1_matched_ttest_pre$advertintegrity, paired = FALSE, conf.level = 0.95)
 
-matched_comparison
+matched_comparison =  matched_comparison %>%
+  broom::tidy() %>% 
+  mutate(`N (total)` = nrow(dv1_matched_ttest_pre) + nrow(dv1_matched_ttest_post),
+         `N (after disaster)` = nrow(dv1_matched_ttest_post))
+
+saveRDS(matched_comparison,'tables/table_8/3_t_test_did_advertperiod.rds')
 
 ##Diff-in-diff ----
 disaster3_did_final$contractday <- as.numeric(disaster3_did_final$contractday)
@@ -1197,6 +1203,13 @@ d_oneyearpost <- d_oneyear %>% filter(timing == 1)
 d_oneyearpre <- d_oneyear %>% filter(timing == 0)
 matched_comparison_oneyear <- t.test(d_oneyearpost$advertintegrity,d_oneyearpre$advertintegrity, paired = FALSE, conf.level = 0.90)
 
+matched_comparison_oneyear =  matched_comparison_oneyear %>%
+  broom::tidy() %>% 
+  mutate(`N (total)` = nrow(d_oneyearpost) + nrow(d_oneyearpost),
+         `N (after disaster)` = nrow(d_oneyearpost))
+
+saveRDS(matched_comparison_oneyear,'tables/table_14/3_t_test_did_advertperiod.rds')
+
 ##Two year ----
 d1_twoyear <- disaster1_final %>% filter(year >= 2007 & year <= 2011) %>% filter(loc == 1)
 d2_twoyear <- disaster2_final %>% filter((year >= 2010) & year <= 2014)%>% filter(loc == 1)
@@ -1225,6 +1238,14 @@ d_threeyear <- rbind(d1_threeyear,d2_threeyear,d3_threeyear,d4_threeyear,d5_thre
 d_threeyearpre <- d_threeyear %>% filter(timing == 0)
 d_threeyearpost <- d_threeyear %>% filter(timing == 1)
 matched_comparison_threeyear <- t.test(d_threeyearpost$advertintegrity,d_threeyearpre$advertintegrity, paired = FALSE, conf.level = 0.90)
+
+matched_comparison_threeyear =  matched_comparison_threeyear %>%
+  broom::tidy() %>% 
+  mutate(`N (total)` = nrow(d_threeyearpre) + nrow(d_threeyearpost),
+         `N (after disaster)` = nrow(d_threeyearpost))
+
+saveRDS(matched_comparison_threeyear,'tables/table_13/3_t_test_did_advertperiod.rds')
+
 
 ###Clustering Standard errors:
 

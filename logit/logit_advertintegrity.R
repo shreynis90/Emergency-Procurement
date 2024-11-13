@@ -283,8 +283,15 @@ summary(margins(model1_logit))
 m = margins(model1_logit)
 stargazer::stargazer(m, type = 'text')
 
+# Monte-Carlo analysis and Bootstrapping ----
+#-------------------------------------------------#
+# TODO: Add Monte-Carlo analysis and Bootstrapping
+saveRDS(italy_reg, 'logit_advertintegrity.Rds')
 
-##full priod clustered standard errors:
+readRDS('logit_advertintegrity.Rds')
+#-------------------------------------------------#
+
+##full period clustered standard errors:
 
 
 library(multiwayvcov)
@@ -325,3 +332,4 @@ print(summary_coeftest_model1)
 # Calculate and print marginal effects
 margins_model1 <- margins(model1_logit, vcov = clustered_se_model1)
 print(summary(margins_model1))
+

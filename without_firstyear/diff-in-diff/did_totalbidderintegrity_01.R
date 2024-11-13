@@ -1161,7 +1161,14 @@ dv1_post <- dv1 %>% filter(timing == 1)
 
 matched_comparison<- t.test(dv1_post$totalbiddersintegrity,dv1_pre$totalbiddersintegrity, paired = FALSE, conf.level = 0.90)
 
+matched_comparison =  matched_comparison %>%
+  broom::tidy() %>% 
+  mutate(`N (total)` = nrow(dv1_pre) + nrow(dv1_post),
+         `N (after disaster)` = nrow(dv1_post))
+
 matched_comparison
+
+saveRDS(matched_comparison,'tables/robustness/table_22/4_t_test_did_totalbidderintegrity.rds')
 
 ##Diff-in-diff ----
 disaster3_did_final$contractday <- as.numeric(disaster3_did_final$contractday)
@@ -1245,14 +1252,14 @@ didreg2 = lm(totalbiddersintegrity ~ loc*timing +  contractyear + contractmonth 
 
 summary(didreg2)
 
-saveRDS(didreg2, '4_totalbidderintegrity_did.Rds')
+saveRDS(didreg2, 'tables/robustness/table_23/4_totalbidderintegrity_did.Rds')
 
 clustered_se <- cluster.vcov(didreg2, dv4[[cluster_var]])
 
 summary_coeftest <- coeftest(didreg2, clustered_se)
 print(summary_coeftest)
 
-saveRDS(summary_coeftest, '4_totalbidderintegrity_did_clustered_se.Rds')
+saveRDS(summary_coeftest, 'tables/robustness/table_23/4_totalbidderintegrity_did_clustered_se.Rds')
 
 distinct_rows <- dv4 %>% distinct(buyer_nuts)
 print(distinct_rows)
