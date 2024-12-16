@@ -291,6 +291,11 @@ saveRDS(italy_reg, 'logit_advertintegrity.Rds')
 readRDS('logit_advertintegrity.Rds')
 #-------------------------------------------------#
 
+#-------------------------------------------------#
+# table 19 `italy_reg1` ----
+# TODO: EXPORT italy_reg1 for table 19
+saveRDS(italy_reg1, 'italy_reg1_logit_advertintegrity.Rds')
+#-------------------------------------------------#
 ##full period clustered standard errors:
 
 
