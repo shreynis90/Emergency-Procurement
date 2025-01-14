@@ -290,13 +290,15 @@ summary(margins(model1_logit))
 # TODO: Add Monte-Carlo analysis and Bootstrapping
 saveRDS(italy_reg, 'logit_totalbidderintergrity.Rds')
 
-readRDS('logit_totalbidderintergrity.Rds')
+italy_reg<-readRDS('logit_totalbidderintergrity.Rds')
 #-------------------------------------------------#
 
 #-------------------------------------------------#
 # table 19 `italy_reg1` ----
 # TODO: EXPORT italy_reg1 for table 19
 saveRDS(italy_reg1, 'italy_reg1_logit_totalbidderintergrity.Rds')
+
+italy_reg1<-readRDS('italy_reg1_logit_totalbidderintergrity.Rds')
 #-------------------------------------------------#
 
 ##full period clustered standard errors:
@@ -305,9 +307,11 @@ saveRDS(italy_reg1, 'italy_reg1_logit_totalbidderintergrity.Rds')
 library(multiwayvcov)
 library(lmtest)
 
-cluster_var <- "buyer_nuts"
+italy_reg$cl<-paste(italy_reg$disnumber,"-", italy_reg$contractyear)
+cluster_var <- "cl"
 
 # Summarize the model
+model_logit<- glm(totalbidderintegrity ~ treatmentstatus + factor(newcpv) + buyer+ log_contractvalue + contractyear + contractmonth, family ="binomial", data = italy_reg)
 summary(model_logit)
 
 # Calculate clustered standard errors
@@ -323,9 +327,13 @@ print(summary_coeftest)
 margins_model <- margins(model_logit, vcov = clustered_se)
 print(summary(margins_model))
 
+
 ##1 year clustered standard errors:
 
 # Calculate clustered standard errors
+model1_logit<- glm(totalbidderintegrity ~ treatmentstatus + contractmonth  + log_contractvalue + buyer, family ="binomial", data = italy_reg1)
+italy_reg1$cl<-paste(italy_reg1$disnumber,"-", italy_reg1$contractyear)
+cluster_var <- "cl"
 clustered_se_model1 <- cluster.vcov(model1_logit, italy_reg1[[cluster_var]])
 
 # Use coeftest with clustered standard errors
